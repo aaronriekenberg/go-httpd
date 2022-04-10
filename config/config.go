@@ -15,15 +15,27 @@ type DirectoryLocation struct {
 	DirectoryPath string `json:"directoryPath"`
 }
 
+type RedirectLocation struct {
+	RedirectURL    string `json:"redirectURL"`
+	ResponseStatus int    `json:"responseStatus"`
+}
+
 type Location struct {
 	HttpPathPrefix    string             `json:"httpPathPrefix"`
 	BlockedLocation   *BlockedLocation   `json:"blockedLocation"`
 	DirectoryLocation *DirectoryLocation `json:"directoryLocation"`
+	RedirectLocation  *RedirectLocation  `json:"redirectLocation"`
+}
+
+type TLSInfo struct {
+	CertFile string `json:"certFile"`
+	KeyFile  string `json:"keyFile"`
 }
 
 type Server struct {
 	ListenAddress string     `json:"listenAddress"`
 	Locations     []Location `json:"locations"`
+	TLSInfo       *TLSInfo   `json:"tlsInfo"`
 }
 
 type Configuration struct {

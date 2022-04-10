@@ -22,13 +22,13 @@ func createBlockedLocationHandler(
 
 	log.Printf("createBlockedLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
-	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(blockedLocation.ResponseStatus)
-	}
-
 	return locationHandler{
 		httpPathPrefix: httpPathPrefix,
-		httpHandler:    handler,
+		httpHandler: http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(blockedLocation.ResponseStatus)
+			},
+		),
 	}
 }
 
@@ -49,6 +49,34 @@ func createDirectoryLocationHandler(
 				),
 			),
 		),
+	}
+}
+
+func createRedirectLocationHandler(
+	httpPathPrefix string,
+	redirectLocation config.RedirectLocation,
+) locationHandler {
+
+	log.Printf("createRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
+
+	handler := http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+
+			if r.URL == nil {
+				http.Error(w, "request url is nil in redirect handler", http.StatusInternalServerError)
+				return
+			}
+
+			redirectURL := strings.ReplaceAll(redirectLocation.RedirectURL, "$REQUEST_PATH", r.URL.Path)
+
+			http.Redirect(w, r, redirectURL, redirectLocation.ResponseStatus)
+
+		},
+	)
+
+	return locationHandler{
+		httpPathPrefix: httpPathPrefix,
+		httpHandler:    handler,
 	}
 }
 
@@ -104,6 +132,15 @@ func createServerHandler(
 				),
 			)
 
+		case location.RedirectLocation != nil:
+			handler.locationHandlers = append(
+				handler.locationHandlers,
+				createRedirectLocationHandler(
+					location.HttpPathPrefix,
+					*location.RedirectLocation,
+				),
+			)
+
 		default:
 			log.Fatalf("invalid location config: \n%# v", pretty.Formatter(location))
 		}
@@ -112,23 +149,50 @@ func createServerHandler(
 	return handler
 }
 
+func runServer(
+	serverConfig config.Server,
+) {
+	handler := createServerHandler(serverConfig.Locations)
+
+	server := &http.Server{
+		Addr:    serverConfig.ListenAddress,
+		Handler: handler,
+	}
+
+	if serverConfig.TLSInfo != nil {
+		log.Printf("before ListenAndServeTLS listenAddress = %q", serverConfig.ListenAddress)
+
+		err := server.ListenAndServeTLS(
+			serverConfig.TLSInfo.CertFile,
+			serverConfig.TLSInfo.KeyFile,
+		)
+
+		log.Fatalf(
+			"server.ListenAndServeTLS err = %v",
+			err,
+		)
+
+	} else {
+		log.Printf("before ListenAndServe listenAddress = %q", serverConfig.ListenAddress)
+
+		err := server.ListenAndServe()
+
+		log.Fatalf(
+			"server.ListenAndServe err = %v",
+			err,
+		)
+	}
+}
+
 func StartServers(
 	servers []config.Server,
 ) {
-
 	log.Printf("begin StartServers")
 
-	for _, server := range servers {
-		log.Printf("server:\n%# v", pretty.Formatter(server))
+	for _, serverConfig := range servers {
+		log.Printf("serverConfig:\n%# v", pretty.Formatter(serverConfig))
 
-		handler := createServerHandler(server.Locations)
-
-		server := &http.Server{
-			Addr:    server.ListenAddress,
-			Handler: handler,
-		}
-
-		go log.Fatalf("server.ListenAndServe %v", server.ListenAndServe())
+		go runServer(serverConfig)
 	}
 
 	log.Printf("end StartServers")

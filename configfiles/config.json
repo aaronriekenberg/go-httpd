@@ -17,6 +17,35 @@
                     }
                 },
                 {
+                    "httpPathPrefix": "",
+                    "redirectLocation": {
+                        "redirectURL": "https://localhost:8443$REQUEST_PATH",
+                        "responseStatus": 302
+                    }
+                }
+            ]
+        },
+        {
+            "listenAddress": ":8443",
+            "tlsInfo": {
+                "certFile": "cert.pem",
+                "keyFile": "key.pem"
+            },
+            "locations": [
+                {
+                    "httpPathPrefix": "/.git",
+                    "blockedLocation": {
+                        "responseStatus": 403
+                    }
+                },
+                {
+                    "httpPathPrefix": "/.well-known/acme-challenge/",
+                    "directoryLocation": {
+                        "stripPrefix": "/.well-known/acme-challenge/",
+                        "directoryPath": "/Users/aaron/acme"
+                    }
+                },
+                {
                     "httpPathPrefix": "/",
                     "directoryLocation": {
                         "directoryPath": "/Users/aaron"
