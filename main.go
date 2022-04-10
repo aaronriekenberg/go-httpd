@@ -9,7 +9,7 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/aaronriekenberg/go-httpd/config"
-	"github.com/aaronriekenberg/go-httpd/server"
+	"github.com/aaronriekenberg/go-httpd/servers"
 )
 
 func awaitShutdownSignal() {
@@ -31,7 +31,7 @@ func main() {
 	configuration := config.ReadConfiguration(configFile)
 	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
-	server.StartServers(configuration.Servers)
+	servers.StartServers(configuration.Servers)
 
 	awaitShutdownSignal()
 }
