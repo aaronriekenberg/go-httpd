@@ -7,6 +7,7 @@ import (
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/kr/pretty"
+	"github.com/yookoala/gofast"
 )
 
 type locationHandler struct {
@@ -79,6 +80,31 @@ func createRedirectLocationHandler(
 	}
 }
 
+func createFastCGILocationHandler(
+	httpPathPrefix string,
+	fastCGILocation config.FastCGILocation,
+) locationHandler {
+
+	log.Printf("createFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
+
+	sessionHandler := gofast.Chain(
+		gofast.BasicParamsMap, // maps common CGI parameters
+		gofast.MapHeader,      // maps header fields into HTTP_* parameters
+	)(gofast.BasicSession)
+
+	connectionFactory := gofast.SimpleConnFactory("unix", fastCGILocation.UnixSocketPath)
+
+	handler := gofast.NewHandler(
+		sessionHandler,
+		gofast.SimpleClientFactory(connectionFactory),
+	)
+
+	return locationHandler{
+		httpPathPrefix: httpPathPrefix,
+		httpHandler:    handler,
+	}
+}
+
 type locationListHandler struct {
 	locationHandlers []locationHandler
 }
@@ -137,6 +163,15 @@ func CreateLocationsHandler(
 				createRedirectLocationHandler(
 					location.HttpPathPrefix,
 					*location.RedirectLocation,
+				),
+			)
+
+		case location.FastCGILocation != nil:
+			handler.locationHandlers = append(
+				handler.locationHandlers,
+				createFastCGILocationHandler(
+					location.HttpPathPrefix,
+					*location.FastCGILocation,
 				),
 			)
 

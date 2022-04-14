@@ -46,6 +46,12 @@
                     }
                 },
                 {
+                    "httpPathPrefix": "/cgi-bin/",
+                    "fastCGILocation": {
+                        "unixSocketPath": "/tmp/go-fastcgi.sock"
+                    }
+                },
+                {
                     "httpPathPrefix": "/",
                     "directoryLocation": {
                         "directoryPath": "/Users/aaron"

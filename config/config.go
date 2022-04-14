@@ -20,11 +20,16 @@ type RedirectLocation struct {
 	ResponseStatus int    `json:"responseStatus"`
 }
 
+type FastCGILocation struct {
+	UnixSocketPath string `json:"unixSocketPath"`
+}
+
 type Location struct {
 	HttpPathPrefix    string             `json:"httpPathPrefix"`
 	BlockedLocation   *BlockedLocation   `json:"blockedLocation"`
 	DirectoryLocation *DirectoryLocation `json:"directoryLocation"`
 	RedirectLocation  *RedirectLocation  `json:"redirectLocation"`
+	FastCGILocation   *FastCGILocation   `json:"fastCGILocation"`
 }
 
 type TLSInfo struct {
