@@ -113,6 +113,8 @@ func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter,
 	requestURLPath := r.URL.Path
 	log.Printf("requestURLPath = %q", requestURLPath)
 
+	var handler http.Handler
+
 	for _, locationHandler := range locationListHandler.locationHandlers {
 
 		match := strings.HasPrefix(requestURLPath, locationHandler.httpPathPrefix)
@@ -120,13 +122,17 @@ func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter,
 		log.Printf("match = %v", match)
 
 		if match {
-			locationHandler.httpHandler.ServeHTTP(w, r)
-			return
+			handler = locationHandler.httpHandler
+			break
 		}
 	}
 
-	log.Printf("got to end of locationHandlers with no match, requestURLPath = %q", requestURLPath)
-	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	if handler == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	handler.ServeHTTP(w, r)
 }
 
 func CreateLocationsHandler(
