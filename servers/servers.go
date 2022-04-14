@@ -12,9 +12,8 @@ import (
 )
 
 func runServer(
-	serverID string,
 	listenAddress string,
-	tlsInfo *config.TLSInfo,
+	serverConfig config.Server,
 	handler http.Handler,
 ) {
 
@@ -23,22 +22,24 @@ func runServer(
 		Handler: handler,
 	}
 
-	if tlsInfo != nil {
-		log.Printf("before ListenAndServeTLS serverID = %q listenAddress = %q", serverID, listenAddress)
+	serverConfig.HTTPServerTimeouts.ApplyToHTTPServer(server)
+
+	if serverConfig.TLSInfo != nil {
+		log.Printf("before ListenAndServeTLS serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
 
 		err := server.ListenAndServeTLS(
-			tlsInfo.CertFile,
-			tlsInfo.KeyFile,
+			serverConfig.TLSInfo.CertFile,
+			serverConfig.TLSInfo.KeyFile,
 		)
 
-		log.Fatalf("server.ListenAndServeTLS err = %v serverID = %q listenAddress = %q", err, serverID, listenAddress)
+		log.Fatalf("server.ListenAndServeTLS err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
 
 	} else {
-		log.Printf("before ListenAndServe serverID = %q listenAddress = %q", serverID, listenAddress)
+		log.Printf("before ListenAndServe serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
 
 		err := server.ListenAndServe()
 
-		log.Fatalf("server.ListenAndServe err = %v serverID = %q listenAddress = %q", err, serverID, listenAddress)
+		log.Fatalf("server.ListenAndServe err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
 	}
 
 }
@@ -59,9 +60,8 @@ func StartServers(
 
 		for _, listenAddress := range serverConfig.ListenAddressList {
 			go runServer(
-				serverConfig.ServerID,
 				listenAddress,
-				serverConfig.TLSInfo,
+				serverConfig,
 				handler,
 			)
 		}

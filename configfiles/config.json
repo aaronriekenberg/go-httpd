@@ -5,6 +5,10 @@
             "listenAddressList": [
                 ":8080"
             ],
+            "httpServerTimeouts": {
+                "readTimeoutMilliseconds": 30000,
+                "writeTimeoutMilliseconds": 30000
+            },
             "logRequests": true,
             "locations": [
                 {
@@ -37,6 +41,10 @@
             "tlsInfo": {
                 "certFile": "cert.pem",
                 "keyFile": "key.pem"
+            },
+            "httpServerTimeouts": {
+                "readTimeoutMilliseconds": 30000,
+                "writeTimeoutMilliseconds": 30000
             },
             "logRequests": true,
             "locations": [

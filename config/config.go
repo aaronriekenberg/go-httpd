@@ -3,7 +3,9 @@ package config
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"os"
+	"time"
 )
 
 type BlockedLocation struct {
@@ -37,12 +39,29 @@ type TLSInfo struct {
 	KeyFile  string `json:"keyFile"`
 }
 
+type HTTPServerTimeouts struct {
+	ReadTimeoutMilliseconds  int `json:"readTimeoutMilliseconds"`
+	WriteTimeoutMilliseconds int `json:"writeTimeoutMilliseconds"`
+}
+
+func (httpServerTimeouts *HTTPServerTimeouts) ApplyToHTTPServer(httpServer *http.Server) {
+	if httpServerTimeouts == nil {
+		return
+	}
+
+	httpServer.ReadTimeout = time.Duration(httpServerTimeouts.ReadTimeoutMilliseconds) * time.Millisecond
+	httpServer.WriteTimeout = time.Duration(httpServerTimeouts.WriteTimeoutMilliseconds) * time.Millisecond
+
+	log.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
+}
+
 type Server struct {
-	ServerID          string     `json:"serverID"`
-	ListenAddressList []string   `json:"listenAddressList"`
-	TLSInfo           *TLSInfo   `json:"tlsInfo"`
-	LogRequests       bool       `json:"logRequests"`
-	Locations         []Location `json:"locations"`
+	ServerID           string              `json:"serverID"`
+	ListenAddressList  []string            `json:"listenAddressList"`
+	TLSInfo            *TLSInfo            `json:"tlsInfo"`
+	HTTPServerTimeouts *HTTPServerTimeouts `json:"httpServerTimeouts"`
+	LogRequests        bool                `json:"logRequests"`
+	Locations          []Location          `json:"locations"`
 }
 
 type Configuration struct {

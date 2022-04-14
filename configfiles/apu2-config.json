@@ -6,6 +6,10 @@
                 "127.0.0.1:8080",
                 "[::1]:8080"
             ],
+            "httpServerTimeouts": {
+                "readTimeoutMilliseconds": 30000,
+                "writeTimeoutMilliseconds": 30000
+            },
             "logRequests": true,
             "locations": [
                 {
@@ -39,6 +43,10 @@
             "tlsInfo": {
                 "certFile": "aaronr.digital.fullchain.pem",
                 "keyFile": "aaronr.digital.key"
+            },
+            "httpServerTimeouts": {
+                "readTimeoutMilliseconds": 30000,
+                "writeTimeoutMilliseconds": 30000
             },
             "logRequests": true,
             "locations": [
