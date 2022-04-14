@@ -6,13 +6,13 @@ import (
 	"os"
 
 	gorillaHandlers "github.com/gorilla/handlers"
-	"github.com/kr/pretty"
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/handlers"
 )
 
 func runServer(
+	serverID string,
 	listenAddress string,
 	tlsInfo *config.TLSInfo,
 	handler http.Handler,
@@ -24,21 +24,21 @@ func runServer(
 	}
 
 	if tlsInfo != nil {
-		log.Printf("before ListenAndServeTLS listenAddress = %q", listenAddress)
+		log.Printf("before ListenAndServeTLS serverID = %q listenAddress = %q", serverID, listenAddress)
 
 		err := server.ListenAndServeTLS(
 			tlsInfo.CertFile,
 			tlsInfo.KeyFile,
 		)
 
-		log.Fatalf("server.ListenAndServeTLS err = %v", err)
+		log.Fatalf("server.ListenAndServeTLS err = %v serverID = %q listenAddress = %q", err, serverID, listenAddress)
 
 	} else {
-		log.Printf("before ListenAndServe listenAddress = %q", listenAddress)
+		log.Printf("before ListenAndServe serverID = %q listenAddress = %q", serverID, listenAddress)
 
 		err := server.ListenAndServe()
 
-		log.Fatalf("server.ListenAndServe err = %v", err)
+		log.Fatalf("server.ListenAndServe err = %v serverID = %q listenAddress = %q", err, serverID, listenAddress)
 	}
 
 }
@@ -49,7 +49,7 @@ func StartServers(
 	log.Printf("begin StartServers")
 
 	for _, serverConfig := range servers {
-		log.Printf("serverConfig:\n%# v", pretty.Formatter(serverConfig))
+		log.Printf("StartServers serverID %q", serverConfig.ServerID)
 
 		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
 
@@ -59,6 +59,7 @@ func StartServers(
 
 		for _, listenAddress := range serverConfig.ListenAddressList {
 			go runServer(
+				serverConfig.ServerID,
 				listenAddress,
 				serverConfig.TLSInfo,
 				handler,

@@ -1,6 +1,7 @@
 {
     "servers": [
         {
+            "serverID": "http",
             "listenAddressList": [
                 ":8080"
             ],
@@ -29,6 +30,7 @@
             ]
         },
         {
+            "serverID": "https",
             "listenAddressList": [
                 ":8443"
             ],

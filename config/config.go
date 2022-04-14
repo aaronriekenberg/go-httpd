@@ -38,6 +38,7 @@ type TLSInfo struct {
 }
 
 type Server struct {
+	ServerID          string     `json:"serverID"`
 	ListenAddressList []string   `json:"listenAddressList"`
 	TLSInfo           *TLSInfo   `json:"tlsInfo"`
 	LogRequests       bool       `json:"logRequests"`
