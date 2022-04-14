@@ -2,6 +2,7 @@
     "servers": [
         {
             "listenAddress": ":8080",
+            "logRequests": true,
             "locations": [
                 {
                     "httpPathPrefix": "/.git",
@@ -31,6 +32,7 @@
                 "certFile": "cert.pem",
                 "keyFile": "key.pem"
             },
+            "logRequests": true,
             "locations": [
                 {
                     "httpPathPrefix": "/.git",

@@ -3,7 +3,9 @@ package servers
 import (
 	"log"
 	"net/http"
+	"os"
 
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/kr/pretty"
 
 	"github.com/aaronriekenberg/go-httpd/config"
@@ -14,6 +16,10 @@ func runServer(
 	serverConfig config.Server,
 ) {
 	handler := handlers.CreateLocationsHandler(serverConfig.Locations)
+
+	if serverConfig.LogRequests {
+		handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
+	}
 
 	server := &http.Server{
 		Addr:    serverConfig.ListenAddress,

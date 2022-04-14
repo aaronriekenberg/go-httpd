@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/kr/pretty"
 	"github.com/yookoala/gofast"
+
+	"github.com/aaronriekenberg/go-httpd/config"
 )
 
 type locationHandler struct {
@@ -67,7 +68,9 @@ func createRedirectLocationHandler(
 				return
 			}
 
-			redirectURL := strings.ReplaceAll(redirectLocation.RedirectURL, "$REQUEST_PATH", r.URL.Path)
+			redirectURL := redirectLocation.RedirectURL
+			redirectURL = strings.ReplaceAll(redirectURL, "$HTTP_HOST", r.Host)
+			redirectURL = strings.ReplaceAll(redirectURL, "$REQUEST_PATH", r.URL.Path)
 
 			http.Redirect(w, r, redirectURL, redirectLocation.ResponseStatus)
 
@@ -111,15 +114,12 @@ type locationListHandler struct {
 
 func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestURLPath := r.URL.Path
-	log.Printf("requestURLPath = %q", requestURLPath)
 
 	var handler http.Handler
 
 	for _, locationHandler := range locationListHandler.locationHandlers {
 
 		match := strings.HasPrefix(requestURLPath, locationHandler.httpPathPrefix)
-
-		log.Printf("match = %v", match)
 
 		if match {
 			handler = locationHandler.httpHandler
@@ -142,7 +142,6 @@ func CreateLocationsHandler(
 	handler := &locationListHandler{}
 
 	for _, location := range locations {
-		log.Printf("location:\n%# v", pretty.Formatter(location))
 
 		switch {
 		case location.BlockedLocation != nil:
