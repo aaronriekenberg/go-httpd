@@ -1,7 +1,9 @@
 {
     "servers": [
         {
-            "listenAddress": ":8080",
+            "listenAddressList": [
+                ":8080"
+            ],
             "logRequests": true,
             "locations": [
                 {
@@ -27,7 +29,9 @@
             ]
         },
         {
-            "listenAddress": ":8443",
+            "listenAddressList": [
+                ":8443"
+            ],
             "tlsInfo": {
                 "certFile": "cert.pem",
                 "keyFile": "key.pem"

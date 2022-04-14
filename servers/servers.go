@@ -13,36 +13,34 @@ import (
 )
 
 func runServer(
-	serverConfig config.Server,
+	listenAddress string,
+	tlsInfo *config.TLSInfo,
+	handler http.Handler,
 ) {
-	handler := handlers.CreateLocationsHandler(serverConfig.Locations)
-
-	if serverConfig.LogRequests {
-		handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
-	}
 
 	server := &http.Server{
-		Addr:    serverConfig.ListenAddress,
+		Addr:    listenAddress,
 		Handler: handler,
 	}
 
-	if serverConfig.TLSInfo != nil {
-		log.Printf("before ListenAndServeTLS listenAddress = %q", serverConfig.ListenAddress)
+	if tlsInfo != nil {
+		log.Printf("before ListenAndServeTLS listenAddress = %q", listenAddress)
 
 		err := server.ListenAndServeTLS(
-			serverConfig.TLSInfo.CertFile,
-			serverConfig.TLSInfo.KeyFile,
+			tlsInfo.CertFile,
+			tlsInfo.KeyFile,
 		)
 
 		log.Fatalf("server.ListenAndServeTLS err = %v", err)
 
 	} else {
-		log.Printf("before ListenAndServe listenAddress = %q", serverConfig.ListenAddress)
+		log.Printf("before ListenAndServe listenAddress = %q", listenAddress)
 
 		err := server.ListenAndServe()
 
 		log.Fatalf("server.ListenAndServe err = %v", err)
 	}
+
 }
 
 func StartServers(
@@ -53,7 +51,19 @@ func StartServers(
 	for _, serverConfig := range servers {
 		log.Printf("serverConfig:\n%# v", pretty.Formatter(serverConfig))
 
-		go runServer(serverConfig)
+		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
+
+		if serverConfig.LogRequests {
+			handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
+		}
+
+		for _, listenAddress := range serverConfig.ListenAddressList {
+			go runServer(
+				listenAddress,
+				serverConfig.TLSInfo,
+				handler,
+			)
+		}
 	}
 
 	log.Printf("end StartServers")

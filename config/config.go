@@ -38,10 +38,10 @@ type TLSInfo struct {
 }
 
 type Server struct {
-	ListenAddress string     `json:"listenAddress"`
-	TLSInfo       *TLSInfo   `json:"tlsInfo"`
-	LogRequests   bool       `json:"logRequests"`
-	Locations     []Location `json:"locations"`
+	ListenAddressList []string   `json:"listenAddressList"`
+	TLSInfo           *TLSInfo   `json:"tlsInfo"`
+	LogRequests       bool       `json:"logRequests"`
+	Locations         []Location `json:"locations"`
 }
 
 type Configuration struct {
