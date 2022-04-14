@@ -1,0 +1,65 @@
+{
+    "servers": [
+        {
+            "listenAddress": ":8080",
+            "logRequests": true,
+            "locations": [
+                {
+                    "httpPathPrefix": "/.git",
+                    "blockedLocation": {
+                        "responseStatus": 403
+                    }
+                },
+                {
+                    "httpPathPrefix": "/.well-known/acme-challenge/",
+                    "directoryLocation": {
+                        "stripPrefix": "/.well-known/acme-challenge/",
+                        "directoryPath": "/var/www/acme"
+                    }
+                },
+                {
+                    "httpPathPrefix": "",
+                    "redirectLocation": {
+                        "redirectURL": "https://localhost:8443$REQUEST_PATH",
+                        "responseStatus": 302
+                    }
+                }
+            ]
+        },
+        {
+            "listenAddress": ":8443",
+            "tlsInfo": {
+                "certFile": "aaronr.digital.fullchain.pem",
+                "keyFile": "aaronr.digital.key"
+            },
+            "logRequests": true,
+            "locations": [
+                {
+                    "httpPathPrefix": "/.git",
+                    "blockedLocation": {
+                        "responseStatus": 403
+                    }
+                },
+                {
+                    "httpPathPrefix": "/.well-known/acme-challenge/",
+                    "directoryLocation": {
+                        "stripPrefix": "/.well-known/acme-challenge/",
+                        "directoryPath": "/var/www/acme"
+                    }
+                },
+                {
+                    "httpPathPrefix": "/cgi-bin/",
+                    "fastCGILocation": {
+                        "unixSocketPath": "/var/www/run/go-fastcgi/socket"
+                    }
+                },
+                {
+                    "httpPathPrefix": "",
+                    "directoryLocation": {
+                        "directoryPath": "/var/www/htdocs/aaronr.digital"
+                    }
+                }
+            ]
+        }
+    ]
+}
