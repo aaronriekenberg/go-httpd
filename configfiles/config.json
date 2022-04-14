@@ -12,12 +12,6 @@
             "logRequests": true,
             "locations": [
                 {
-                    "httpPathPrefix": "/.git",
-                    "blockedLocation": {
-                        "responseStatus": 403
-                    }
-                },
-                {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
