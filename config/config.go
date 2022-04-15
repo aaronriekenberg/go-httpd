@@ -39,18 +39,18 @@ type TLSInfo struct {
 	KeyFile  string `json:"keyFile"`
 }
 
-type HTTPServerTimeouts struct {
+type Timeouts struct {
 	ReadTimeoutMilliseconds  int `json:"readTimeoutMilliseconds"`
 	WriteTimeoutMilliseconds int `json:"writeTimeoutMilliseconds"`
 }
 
-func (httpServerTimeouts *HTTPServerTimeouts) ApplyToHTTPServer(httpServer *http.Server) {
-	if httpServerTimeouts == nil {
+func (timeouts *Timeouts) ApplyToHTTPServer(httpServer *http.Server) {
+	if timeouts == nil {
 		return
 	}
 
-	httpServer.ReadTimeout = time.Duration(httpServerTimeouts.ReadTimeoutMilliseconds) * time.Millisecond
-	httpServer.WriteTimeout = time.Duration(httpServerTimeouts.WriteTimeoutMilliseconds) * time.Millisecond
+	httpServer.ReadTimeout = time.Duration(timeouts.ReadTimeoutMilliseconds) * time.Millisecond
+	httpServer.WriteTimeout = time.Duration(timeouts.WriteTimeoutMilliseconds) * time.Millisecond
 
 	log.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
 }
@@ -60,12 +60,12 @@ type Chroot struct {
 }
 
 type Server struct {
-	ServerID           string              `json:"serverID"`
-	ListenAddressList  []string            `json:"listenAddressList"`
-	TLSInfo            *TLSInfo            `json:"tlsInfo"`
-	HTTPServerTimeouts *HTTPServerTimeouts `json:"httpServerTimeouts"`
-	LogRequests        bool                `json:"logRequests"`
-	Locations          []Location          `json:"locations"`
+	ServerID          string     `json:"serverID"`
+	ListenAddressList []string   `json:"listenAddressList"`
+	TLSInfo           *TLSInfo   `json:"tlsInfo"`
+	Timeouts          *Timeouts  `json:"timeouts"`
+	LogRequests       bool       `json:"logRequests"`
+	Locations         []Location `json:"locations"`
 }
 
 type Configuration struct {

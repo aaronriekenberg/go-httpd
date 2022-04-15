@@ -22,7 +22,7 @@ func runServer(
 		Handler: handler,
 	}
 
-	serverConfig.HTTPServerTimeouts.ApplyToHTTPServer(server)
+	serverConfig.Timeouts.ApplyToHTTPServer(server)
 
 	if serverConfig.TLSInfo != nil {
 		log.Printf("before ListenAndServeTLS serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)

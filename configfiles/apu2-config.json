@@ -6,7 +6,7 @@
                 "127.0.0.1:8080",
                 "[::1]:8080"
             ],
-            "httpServerTimeouts": {
+            "timeouts": {
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
