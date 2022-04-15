@@ -55,6 +55,10 @@ func (httpServerTimeouts *HTTPServerTimeouts) ApplyToHTTPServer(httpServer *http
 	log.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
 }
 
+type Chroot struct {
+	DirectoryPath string `json:"directoryPath"`
+}
+
 type Server struct {
 	ServerID           string              `json:"serverID"`
 	ListenAddressList  []string            `json:"listenAddressList"`
@@ -65,6 +69,7 @@ type Server struct {
 }
 
 type Configuration struct {
+	Chroot  *Chroot  `json:"chroot"`
 	Servers []Server `json:"servers"`
 }
 
