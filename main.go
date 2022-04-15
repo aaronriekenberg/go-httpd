@@ -31,14 +31,6 @@ func main() {
 	configuration := config.ReadConfiguration(configFile)
 	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
-	if configuration.Chroot != nil {
-		log.Printf("call Chroot DirectoryPath = %q", configuration.Chroot.DirectoryPath)
-		err := syscall.Chroot(configuration.Chroot.DirectoryPath)
-		if err != nil {
-			log.Fatalf("chroot error = %v", err)
-		}
-	}
-
 	servers.StartServers(configuration.Servers)
 
 	awaitShutdownSignal()
