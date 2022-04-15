@@ -13,8 +13,9 @@ type BlockedLocation struct {
 }
 
 type DirectoryLocation struct {
-	StripPrefix   string `json:"stripPrefix"`
-	DirectoryPath string `json:"directoryPath"`
+	StripPrefix       string `json:"stripPrefix"`
+	CacheControlValue string `json:"cacheControlValue"`
+	DirectoryPath     string `json:"directoryPath"`
 }
 
 type RedirectLocation struct {

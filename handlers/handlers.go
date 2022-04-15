@@ -40,16 +40,27 @@ func createDirectoryLocationHandler(
 
 	log.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler: http.StripPrefix(
-			directoryLocation.StripPrefix,
-			http.FileServer(
-				http.Dir(
-					directoryLocation.DirectoryPath,
-				),
+	fileServer := http.StripPrefix(
+		directoryLocation.StripPrefix,
+		http.FileServer(
+			http.Dir(
+				directoryLocation.DirectoryPath,
 			),
 		),
+	)
+
+	handler := http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if len(directoryLocation.CacheControlValue) > 0 {
+				w.Header().Add("cache-control", directoryLocation.CacheControlValue)
+			}
+			fileServer.ServeHTTP(w, r)
+		},
+	)
+
+	return locationHandler{
+		httpPathPrefix: httpPathPrefix,
+		httpHandler:    handler,
 	}
 }
 
