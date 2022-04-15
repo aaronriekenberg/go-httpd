@@ -1,7 +1,4 @@
 {
-    "chroot": {
-        "directoryPath": "/var/www"
-    },
     "servers": [
         {
             "serverID": "http",
@@ -19,7 +16,7 @@
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "acme"
+                        "directoryPath": "/var/www/acme"
                     }
                 },
                 {
@@ -57,19 +54,19 @@
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "acme"
+                        "directoryPath": "/var/www/acme"
                     }
                 },
                 {
                     "httpPathPrefix": "/cgi-bin/",
                     "fastCGILocation": {
-                        "unixSocketPath": "run/go-fastcgi/socket"
+                        "unixSocketPath": "/var/www/run/go-fastcgi/socket"
                     }
                 },
                 {
                     "httpPathPrefix": "",
                     "directoryLocation": {
-                        "directoryPath": "htdocs/aaronr.digital"
+                        "directoryPath": "/var/www/htdocs/aaronr.digital"
                     }
                 }
             ]
