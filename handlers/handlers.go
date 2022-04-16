@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/kr/pretty"
 	"github.com/yookoala/gofast"
@@ -108,9 +109,16 @@ func createFastCGILocationHandler(
 
 	connectionFactory := gofast.SimpleConnFactory("unix", fastCGILocation.UnixSocketPath)
 
+	// XXX make parameters configurable?
+	connectionPool := gofast.NewClientPool(
+		gofast.SimpleClientFactory(connectionFactory),
+		10,             // buffer size for pre-created client-connection
+		10*time.Second, // life span of a client before expire
+	)
+
 	handler := gofast.NewHandler(
 		sessionHandler,
-		gofast.SimpleClientFactory(connectionFactory),
+		connectionPool.CreateClient,
 	)
 
 	return locationHandler{
