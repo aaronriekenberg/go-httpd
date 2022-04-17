@@ -36,7 +36,7 @@
                 "certFile": "cert.pem",
                 "keyFile": "key.pem"
             },
-            "httpServerTimeouts": {
+            "timeouts": {
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },

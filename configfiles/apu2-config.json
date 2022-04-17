@@ -39,7 +39,7 @@
                 "certFile": "aaronr.digital.fullchain.pem",
                 "keyFile": "aaronr.digital.key"
             },
-            "httpServerTimeouts": {
+            "timeouts": {
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
