@@ -1,0 +1,17 @@
+#!/bin/ksh
+#
+# OpenBSD rc.d file for go-httpd
+# put into /etc/rc.d
+
+daemon="/usr/local/bin/go-httpd"
+daemon_user="www"
+
+. /etc/rc.d/rc.subr
+
+rc_reload=NO
+
+rc_start() {
+	${rcexec} "${daemon} ${daemon_flags} 2>&1 | simplerotate /var/www/gohttpd-logs &"
+}
+
+rc_cmd $1
