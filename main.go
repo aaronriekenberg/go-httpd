@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/kr/pretty"
@@ -11,6 +12,8 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
+
+var gitCommit string
 
 func awaitShutdownSignal() {
 	sig := make(chan os.Signal, 2)
@@ -21,6 +24,8 @@ func awaitShutdownSignal() {
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
+	log.Printf("go version = %q gitCommit = %q", runtime.Version(), gitCommit)
 
 	if len(os.Args) != 2 {
 		log.Fatalf("Usage: %v <config json file>", os.Args[0])
