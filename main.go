@@ -10,6 +10,7 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/aaronriekenberg/go-httpd/config"
+	"github.com/aaronriekenberg/go-httpd/dropprivileges"
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
 
@@ -35,6 +36,8 @@ func main() {
 
 	configuration := config.ReadConfiguration(configFile)
 	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
+
+	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
 	servers.StartServers(configuration.Servers)
 

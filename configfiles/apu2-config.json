@@ -1,4 +1,10 @@
 {
+    "dropPrivileges": {
+        "chrootEnabled": true,
+        "chrootDirectory": "/var/www",
+        "groupName": "www",
+        "userName": "www"
+    },
     "servers": [
         {
             "serverID": "http",

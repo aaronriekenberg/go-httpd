@@ -1,4 +1,10 @@
 {
+    "dropPrivileges": {
+        "chrootEnabled": false,
+        "chrootDirectory": "",
+        "groupName": "everyone",
+        "userName": "test"
+    },
     "servers": [
         {
             "serverID": "http",

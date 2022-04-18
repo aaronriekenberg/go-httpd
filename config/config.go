@@ -56,6 +56,13 @@ func (timeouts *Timeouts) ApplyToHTTPServer(httpServer *http.Server) {
 	log.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
 }
 
+type DropPrivileges struct {
+	ChrootEnabled   bool   `json:"chrootEnabled"`
+	ChrootDirectory string `json:"chrootDirectory"`
+	GroupName       string `json:"groupName"`
+	UserName        string `json:"userName"`
+}
+
 type Server struct {
 	ServerID          string     `json:"serverID"`
 	ListenAddressList []string   `json:"listenAddressList"`
@@ -66,7 +73,8 @@ type Server struct {
 }
 
 type Configuration struct {
-	Servers []Server `json:"servers"`
+	DropPrivileges *DropPrivileges `json:"dropPrivileges"`
+	Servers        []Server        `json:"servers"`
 }
 
 func ReadConfiguration(configFile string) *Configuration {
