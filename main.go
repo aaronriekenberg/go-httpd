@@ -37,9 +37,9 @@ func main() {
 	configuration := config.ReadConfiguration(configFile)
 	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
-	dropprivileges.DropPrivileges(configuration.DropPrivileges)
-
 	servers.StartServers(configuration.Servers)
+
+	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
 	awaitShutdownSignal()
 }

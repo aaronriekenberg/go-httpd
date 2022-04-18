@@ -5,14 +5,28 @@ import (
 	"os"
 	"os/user"
 	"strconv"
+	"sync"
 	"syscall"
 
 	"github.com/aaronriekenberg/go-httpd/config"
 )
 
+var dropPrivilegesWaitGroup sync.WaitGroup
+
+func init() {
+	dropPrivilegesWaitGroup.Add(1)
+}
+
+func AwaitPrivilegeDropped() {
+	dropPrivilegesWaitGroup.Wait()
+}
+
 func DropPrivileges(
 	config *config.DropPrivileges,
 ) {
+
+	defer dropPrivilegesWaitGroup.Done()
+
 	log.Printf("begin DropPrivileges")
 
 	if config == nil {

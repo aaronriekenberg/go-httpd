@@ -8,6 +8,7 @@ import (
 	gorillaHandlers "github.com/gorilla/handlers"
 
 	"github.com/aaronriekenberg/go-httpd/config"
+	"github.com/aaronriekenberg/go-httpd/dropprivileges"
 	"github.com/aaronriekenberg/go-httpd/handlers"
 )
 
@@ -58,11 +59,18 @@ func StartServers(
 			handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
 		}
 
+		awaitDropPrivilegesHandler := http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				dropprivileges.AwaitPrivilegeDropped()
+				handler.ServeHTTP(w, r)
+			},
+		)
+
 		for _, listenAddress := range serverConfig.ListenAddressList {
 			go runServer(
 				listenAddress,
 				serverConfig,
-				handler,
+				awaitDropPrivilegesHandler,
 			)
 		}
 	}
