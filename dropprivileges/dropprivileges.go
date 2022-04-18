@@ -20,19 +20,6 @@ func DropPrivileges(
 		return
 	}
 
-	if config.ChrootEnabled {
-		log.Printf("Chroot to %q", config.ChrootDirectory)
-		err := syscall.Chroot(config.ChrootDirectory)
-		if err != nil {
-			log.Fatalf("Chroot failed: %v", err)
-		}
-
-		err = os.Chdir("/")
-		if err != nil {
-			log.Fatalf("Chdir / failed: %v", err)
-		}
-	}
-
 	userObject, err := user.Lookup(config.UserName)
 	if err != nil {
 		log.Fatalf("Lookup failed: %q", config.UserName)
@@ -56,6 +43,19 @@ func DropPrivileges(
 		log.Fatalf("strconv.Atoi groupObject.Gid = %q error: %v", groupObject.Gid, err)
 	}
 	log.Printf("gidInt = %v", gidInt)
+
+	if config.ChrootEnabled {
+		log.Printf("Chroot to %q", config.ChrootDirectory)
+		err := syscall.Chroot(config.ChrootDirectory)
+		if err != nil {
+			log.Fatalf("Chroot failed: %v", err)
+		}
+
+		err = os.Chdir("/")
+		if err != nil {
+			log.Fatalf("Chdir / failed: %v", err)
+		}
+	}
 
 	err = syscall.Setgroups([]int{gidInt})
 	if err != nil {
