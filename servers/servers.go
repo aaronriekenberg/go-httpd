@@ -1,48 +1,55 @@
 package servers
 
 import (
+	"crypto/tls"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 
 	"github.com/aaronriekenberg/go-httpd/config"
-	"github.com/aaronriekenberg/go-httpd/dropprivileges"
 	"github.com/aaronriekenberg/go-httpd/handlers"
 )
 
-func runServer(
-	listenAddress string,
-	serverConfig config.Server,
-	handler http.Handler,
+var listenAddressToListeners = map[string]net.Listener{}
+
+func CreateListeners(
+	servers []config.Server,
 ) {
+	log.Printf("begin CreateListeners")
 
-	server := &http.Server{
-		Addr:    listenAddress,
-		Handler: handler,
+	for _, serverConfig := range servers {
+		for _, listenAddress := range serverConfig.ListenAddressList {
+
+			if _, exists := listenAddressToListeners[listenAddress]; exists {
+				log.Fatalf("duplicate listenAddress %q", listenAddress)
+			}
+
+			tcpListener, err := net.Listen("tcp", listenAddress)
+			if err != nil {
+				log.Fatalf("net.Listen %v: %v", listenAddress, err)
+			}
+			listenAddressToListeners[listenAddress] = tcpListener
+
+			if serverConfig.TLSInfo != nil {
+				cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
+				if err != nil {
+					log.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
+				}
+
+				var tlsConfig tls.Config
+				tlsConfig.Certificates = make([]tls.Certificate, 1)
+				tlsConfig.Certificates[0] = cert
+
+				tlsListener := tls.NewListener(tcpListener, &tlsConfig)
+
+				listenAddressToListeners[listenAddress] = tlsListener
+			}
+
+		}
 	}
-
-	serverConfig.Timeouts.ApplyToHTTPServer(server)
-
-	if serverConfig.TLSInfo != nil {
-		log.Printf("before ListenAndServeTLS serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
-
-		err := server.ListenAndServeTLS(
-			serverConfig.TLSInfo.CertFile,
-			serverConfig.TLSInfo.KeyFile,
-		)
-
-		log.Fatalf("server.ListenAndServeTLS err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
-
-	} else {
-		log.Printf("before ListenAndServe serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
-
-		err := server.ListenAndServe()
-
-		log.Fatalf("server.ListenAndServe err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
-	}
-
 }
 
 func StartServers(
@@ -59,21 +66,40 @@ func StartServers(
 			handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
 		}
 
-		awaitDropPrivilegesHandler := http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
-				dropprivileges.AwaitPrivilegeDropped()
-				handler.ServeHTTP(w, r)
-			},
-		)
-
 		for _, listenAddress := range serverConfig.ListenAddressList {
 			go runServer(
 				listenAddress,
 				serverConfig,
-				awaitDropPrivilegesHandler,
+				handler,
 			)
 		}
 	}
 
 	log.Printf("end StartServers")
+}
+
+func runServer(
+	listenAddress string,
+	serverConfig config.Server,
+	handler http.Handler,
+) {
+
+	server := &http.Server{
+		Addr:    listenAddress,
+		Handler: handler,
+	}
+
+	serverConfig.Timeouts.ApplyToHTTPServer(server)
+
+	listener, ok := listenAddressToListeners[listenAddress]
+	if !ok {
+		log.Fatalf("unable to find listener listenAddress = %v", listenAddress)
+	}
+
+	log.Printf("before Serve serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
+
+	err := server.Serve(listener)
+
+	log.Fatalf("server.Serve err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
+
 }
