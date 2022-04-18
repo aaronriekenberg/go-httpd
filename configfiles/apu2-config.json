@@ -8,9 +8,15 @@
     "servers": [
         {
             "serverID": "http",
-            "listenAddressList": [
-                ":80",
-                "[::]:80"
+            "networkAndListenAddressList": [
+                {
+                    "network": "tcp4",
+                    "listenAddress": ":80"
+                },
+                {
+                    "network": "tcp6",
+                    "listenAddress": "[::]:80"
+                }
             ],
             "timeouts": {
                 "readTimeoutMilliseconds": 30000,
@@ -37,9 +43,15 @@
         },
         {
             "serverID": "https",
-            "listenAddressList": [
-                ":443",
-                "[::]:443"
+            "networkAndListenAddressList": [
+                {
+                    "network": "tcp4",
+                    "listenAddress": ":443"
+                },
+                {
+                    "network": "tcp6",
+                    "listenAddress": "[::]:443"
+                }
             ],
             "tlsInfo": {
                 "certFile": "/etc/ssl/aaronr.digital.fullchain.pem",

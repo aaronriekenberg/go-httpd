@@ -8,8 +8,11 @@
     "servers": [
         {
             "serverID": "http",
-            "listenAddressList": [
-                ":8080"
+            "networkAndListenAddressList": [
+                {
+                    "network": "tcp",
+                    "listenAddress": ":8080"
+                }
             ],
             "timeouts": {
                 "readTimeoutMilliseconds": 30000,
@@ -35,8 +38,11 @@
         },
         {
             "serverID": "https",
-            "listenAddressList": [
-                ":8443"
+            "networkAndListenAddressList": [
+                {
+                    "network": "tcp",
+                    "listenAddress": ":8443"
+                }
             ],
             "tlsInfo": {
                 "certFile": "cert.pem",

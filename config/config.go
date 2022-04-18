@@ -63,13 +63,18 @@ type DropPrivileges struct {
 	UserName        string `json:"userName"`
 }
 
+type NetworkAndListenAddress struct {
+	Network       string `json:"network"`
+	ListenAddress string `json:"listenAddress"`
+}
+
 type Server struct {
-	ServerID          string     `json:"serverID"`
-	ListenAddressList []string   `json:"listenAddressList"`
-	TLSInfo           *TLSInfo   `json:"tlsInfo"`
-	Timeouts          *Timeouts  `json:"timeouts"`
-	LogRequests       bool       `json:"logRequests"`
-	Locations         []Location `json:"locations"`
+	ServerID                    string                    `json:"serverID"`
+	NetworkAndListenAddressList []NetworkAndListenAddress `json:"networkAndListenAddressList"`
+	TLSInfo                     *TLSInfo                  `json:"tlsInfo"`
+	Timeouts                    *Timeouts                 `json:"timeouts"`
+	LogRequests                 bool                      `json:"logRequests"`
+	Locations                   []Location                `json:"locations"`
 }
 
 type Configuration struct {

@@ -13,7 +13,7 @@ import (
 	"github.com/aaronriekenberg/go-httpd/handlers"
 )
 
-var listenAddressToListeners = map[string]net.Listener{}
+var networkAndListenAddressToListeners = map[config.NetworkAndListenAddress]net.Listener{}
 
 func CreateListeners(
 	servers []config.Server,
@@ -21,17 +21,17 @@ func CreateListeners(
 	log.Printf("begin CreateListeners")
 
 	for _, serverConfig := range servers {
-		for _, listenAddress := range serverConfig.ListenAddressList {
+		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
 
-			if _, exists := listenAddressToListeners[listenAddress]; exists {
-				log.Fatalf("duplicate listenAddress %q", listenAddress)
+			if _, exists := networkAndListenAddressToListeners[networkAndListenAddress]; exists {
+				log.Fatalf("duplicate networkAndListenAddress %q", networkAndListenAddress)
 			}
 
-			tcpListener, err := net.Listen("tcp", listenAddress)
+			tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
 			if err != nil {
-				log.Fatalf("net.Listen %v: %v", listenAddress, err)
+				log.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
 			}
-			listenAddressToListeners[listenAddress] = tcpListener
+			networkAndListenAddressToListeners[networkAndListenAddress] = tcpListener
 
 			if serverConfig.TLSInfo != nil {
 				cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
@@ -45,7 +45,7 @@ func CreateListeners(
 
 				tlsListener := tls.NewListener(tcpListener, &tlsConfig)
 
-				listenAddressToListeners[listenAddress] = tlsListener
+				networkAndListenAddressToListeners[networkAndListenAddress] = tlsListener
 			}
 
 		}
@@ -66,9 +66,9 @@ func StartServers(
 			handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
 		}
 
-		for _, listenAddress := range serverConfig.ListenAddressList {
+		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
 			go runServer(
-				listenAddress,
+				networkAndListenAddress,
 				serverConfig,
 				handler,
 			)
@@ -79,27 +79,27 @@ func StartServers(
 }
 
 func runServer(
-	listenAddress string,
+	networkAndListenAddress config.NetworkAndListenAddress,
 	serverConfig config.Server,
 	handler http.Handler,
 ) {
 
 	server := &http.Server{
-		Addr:    listenAddress,
+		Addr:    networkAndListenAddress.ListenAddress,
 		Handler: handler,
 	}
 
 	serverConfig.Timeouts.ApplyToHTTPServer(server)
 
-	listener, ok := listenAddressToListeners[listenAddress]
+	listener, ok := networkAndListenAddressToListeners[networkAndListenAddress]
 	if !ok {
-		log.Fatalf("unable to find listener listenAddress = %v", listenAddress)
+		log.Fatalf("unable to find listener networkAndListenAddress = %+v", networkAndListenAddress)
 	}
 
-	log.Printf("before Serve serverID = %q listenAddress = %q", serverConfig.ServerID, listenAddress)
+	log.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
 
 	err := server.Serve(listener)
 
-	log.Fatalf("server.Serve err = %v serverID = %q listenAddress = %q", err, serverConfig.ServerID, listenAddress)
+	log.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
 
 }
