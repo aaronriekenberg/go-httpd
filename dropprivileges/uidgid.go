@@ -8,13 +8,13 @@ import (
 )
 
 func internalSetGID(gid int) error {
-	log.Printf("darwin internalSetGID gid = %v", gid)
+	log.Printf("generic internalSetGID gid = %v", gid)
 
 	return syscall.Setgid(gid)
 }
 
 func internalSetUID(uid int) error {
-	log.Printf("darwin internalSetGID uid = %v", uid)
+	log.Printf("generic internalSetGID uid = %v", uid)
 
 	return syscall.Setuid(uid)
 }
