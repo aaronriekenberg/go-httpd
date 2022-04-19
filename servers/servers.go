@@ -109,9 +109,12 @@ func runServer(
 		log.Fatalf("unable to find serverInfo networkAndListenAddress = %+v", networkAndListenAddress)
 	}
 
+	httpServer := serverInfo.httpServer
+	httpServer.Handler = handler
+
 	log.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
 
-	err := serverInfo.httpServer.Serve(serverInfo.netListener)
+	err := httpServer.Serve(serverInfo.netListener)
 
 	log.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
 
