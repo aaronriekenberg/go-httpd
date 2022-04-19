@@ -4,7 +4,6 @@
 # put into /etc/rc.d
 
 daemon="/usr/local/bin/go-httpd"
-daemon_user="www"
 
 . /etc/rc.d/rc.subr
 
