@@ -37,7 +37,7 @@ func main() {
 	configuration := config.ReadConfiguration(configFile)
 	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
-	servers.CreateListeners(configuration.Servers)
+	servers.CreateServers(configuration.Servers)
 
 	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
