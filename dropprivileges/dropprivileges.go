@@ -5,7 +5,8 @@ import (
 	"os"
 	"os/user"
 	"strconv"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 
 	"github.com/aaronriekenberg/go-httpd/config"
 )
@@ -47,7 +48,7 @@ func DropPrivileges(
 
 	if config.ChrootEnabled {
 		log.Printf("Chroot to %q", config.ChrootDirectory)
-		err := syscall.Chroot(config.ChrootDirectory)
+		err := unix.Chroot(config.ChrootDirectory)
 		if err != nil {
 			log.Fatalf("Chroot failed: %v", err)
 		}
@@ -58,9 +59,9 @@ func DropPrivileges(
 		}
 	}
 
-	err = syscall.Setgroups([]int{gidInt})
+	err = unix.Setgroups([]int{gidInt})
 	if err != nil {
-		log.Fatalf("syscall.Setgroups %v error: %v", []int{gidInt}, err)
+		log.Fatalf("unix.Setgroups %v error: %v", []int{gidInt}, err)
 	}
 
 	err = internalSetGID(gidInt)
