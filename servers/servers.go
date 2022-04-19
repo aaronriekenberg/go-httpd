@@ -50,7 +50,7 @@ func CreateListeners(
 				tlsConfig.Certificates = make([]tls.Certificate, 1)
 				tlsConfig.Certificates[0] = cert
 
-				tlsConfig.NextProtos = append(tlsConfig.NextProtos, "http/1.1", "h2")
+				tlsConfig.NextProtos = append(tlsConfig.NextProtos, "h2", "http/1.1")
 
 				log.Printf("tlsConfig.NextProtos = %q", tlsConfig.NextProtos)
 
@@ -105,8 +105,8 @@ func runServer(
 
 	server := &http.Server{
 		Addr:      networkAndListenAddress.ListenAddress,
-		Handler:   handler,
 		TLSConfig: serverInfo.tlsConfig,
+		Handler:   handler,
 	}
 
 	serverConfig.Timeouts.ApplyToHTTPServer(server)
