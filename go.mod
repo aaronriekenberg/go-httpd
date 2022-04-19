@@ -6,7 +6,6 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/kr/pretty v0.3.0
 	github.com/yookoala/gofast v0.6.0
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad
 )
 
 require (

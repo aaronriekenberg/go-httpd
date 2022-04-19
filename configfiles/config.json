@@ -29,51 +29,6 @@
                     }
                 }
             ]
-        },
-        {
-            "serverID": "https",
-            "networkAndListenAddressList": [
-                {
-                    "network": "tcp",
-                    "listenAddress": ":8443"
-                }
-            ],
-            "tlsInfo": {
-                "certFile": "cert.pem",
-                "keyFile": "key.pem"
-            },
-            "timeouts": {
-                "readTimeoutMilliseconds": 30000,
-                "writeTimeoutMilliseconds": 30000
-            },
-            "logRequests": true,
-            "locations": [
-                {
-                    "httpPathPrefix": "/.git",
-                    "blockedLocation": {
-                        "responseStatus": 403
-                    }
-                },
-                {
-                    "httpPathPrefix": "/.well-known/acme-challenge/",
-                    "directoryLocation": {
-                        "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "/Users/aaron/acme"
-                    }
-                },
-                {
-                    "httpPathPrefix": "/cgi-bin/",
-                    "fastCGILocation": {
-                        "unixSocketPath": "/tmp/go-fastcgi.sock"
-                    }
-                },
-                {
-                    "httpPathPrefix": "/",
-                    "directoryLocation": {
-                        "directoryPath": "/Users/aaron"
-                    }
-                }
-            ]
         }
     ]
 }
