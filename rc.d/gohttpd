@@ -10,8 +10,4 @@ daemon="/usr/local/bin/go-httpd"
 rc_reload=NO
 rc_bg=YES
 
-rc_start() {
-	${rcexec} "${daemon} ${daemon_flags} 2>&1 | simplerotate /var/www/gohttpd-logs"
-}
-
 rc_cmd $1
