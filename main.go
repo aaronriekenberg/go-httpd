@@ -11,6 +11,7 @@ import (
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/dropprivileges"
+	"github.com/aaronriekenberg/go-httpd/requestlogger"
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
 
@@ -41,7 +42,12 @@ func main() {
 
 	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
-	servers.StartServers(configuration.Servers)
+	requestLogger := requestlogger.CreateRequestLogger(configuration.RequestLogger)
+
+	servers.StartServers(
+		configuration.Servers,
+		requestLogger,
+	)
 
 	awaitShutdownSignal()
 }

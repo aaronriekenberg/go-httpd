@@ -5,6 +5,11 @@
         "groupName": "www",
         "userName": "www"
     },
+    "requestLogger": {
+        "requestLogFile": "/gohttpd-logs/request.log",
+        "maxSizeMegabytes": 1,
+        "maxBackups": 10
+    },
     "servers": [
         {
             "serverID": "http",
@@ -22,7 +27,6 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
-            "logRequests": true,
             "locations": [
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
@@ -61,7 +65,6 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
-            "logRequests": true,
             "locations": [
                 {
                     "httpPathPrefix": "/.git",

@@ -14,4 +14,5 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	golang.org/x/tools v0.1.10 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )

@@ -63,6 +63,12 @@ type DropPrivileges struct {
 	UserName        string `json:"userName"`
 }
 
+type RequestLogger struct {
+	RequestLogFile   string `json:"requestLogFile"`
+	MaxSizeMegabytes int    `json:"maxSizeMegabytes"`
+	MaxBackups       int    `json:"maxBackups"`
+}
+
 type NetworkAndListenAddress struct {
 	Network       string `json:"network"`
 	ListenAddress string `json:"listenAddress"`
@@ -73,12 +79,12 @@ type Server struct {
 	NetworkAndListenAddressList []NetworkAndListenAddress `json:"networkAndListenAddressList"`
 	TLSInfo                     *TLSInfo                  `json:"tlsInfo"`
 	Timeouts                    *Timeouts                 `json:"timeouts"`
-	LogRequests                 bool                      `json:"logRequests"`
 	Locations                   []Location                `json:"locations"`
 }
 
 type Configuration struct {
 	DropPrivileges *DropPrivileges `json:"dropPrivileges"`
+	RequestLogger  *RequestLogger  `json:"requestLogger"`
 	Servers        []Server        `json:"servers"`
 }
 

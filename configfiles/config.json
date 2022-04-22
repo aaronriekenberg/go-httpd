@@ -1,4 +1,9 @@
 {
+    "requestLogger": {
+        "requestLogFile": "request.log",
+        "maxSizeMegabytes": 1,
+        "maxBackups": 10
+    },
     "servers": [
         {
             "serverID": "http",
@@ -12,7 +17,6 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
-            "logRequests": true,
             "locations": [
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
@@ -23,9 +27,9 @@
                 },
                 {
                     "httpPathPrefix": "",
-                    "redirectLocation": {
-                        "redirectURL": "https://localhost:8443$REQUEST_PATH",
-                        "responseStatus": 302
+                    "directoryLocation": {
+                        "cacheControlValue": "public, max-age=150",
+                        "directoryPath": "."
                     }
                 }
             ]

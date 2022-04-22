@@ -5,12 +5,12 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/handlers"
+	"github.com/aaronriekenberg/go-httpd/requestlogger"
 )
 
 type serverInfo struct {
@@ -76,6 +76,7 @@ func CreateServers(
 
 func StartServers(
 	servers []config.Server,
+	requestLogger *requestlogger.RequestLogger,
 ) {
 	log.Printf("begin StartServers")
 
@@ -84,8 +85,8 @@ func StartServers(
 
 		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
 
-		if serverConfig.LogRequests {
-			handler = gorillaHandlers.CombinedLoggingHandler(os.Stdout, handler)
+		if requestLogger != nil {
+			handler = gorillaHandlers.CombinedLoggingHandler(requestLogger.Writer, handler)
 		}
 
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
