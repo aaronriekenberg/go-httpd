@@ -10,3 +10,4 @@ build:
 
 install:
 	install -o root -g wheel -m 555 go-httpd /usr/local/bin/go-httpd
+	install -o root -g wheel -m 555 rc.d/gohttpd /etc/rc.d/gohttpd
