@@ -60,17 +60,17 @@ func DropPrivileges(
 
 	err = syscall.Setgroups([]int{gidInt})
 	if err != nil {
-		log.Fatalf("unix.Setgroups %v error: %v", []int{gidInt}, err)
+		log.Fatalf("syscall.Setgroups %v error: %v", []int{gidInt}, err)
 	}
 
-	err = internalSetGID(gidInt)
+	err = syscall.Setgid(gidInt)
 	if err != nil {
-		log.Fatalf("internalSetGID gitInt = %v error: %v", gidInt, err)
+		log.Fatalf("syscall.Setgid gitInt = %v error: %v", gidInt, err)
 	}
 
-	err = internalSetUID(uidInt)
+	err = syscall.Setuid(uidInt)
 	if err != nil {
-		log.Fatalf("internalSetUID uidInt = %v error: %v", uidInt, err)
+		log.Fatalf("syscall.Setuid uidInt = %v error: %v", uidInt, err)
 	}
 
 	log.Printf("end DropPrivileges")
