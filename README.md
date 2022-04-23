@@ -27,12 +27,12 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 * Example config files in `configfiles` directory
 * Config file sections
   * dropPrivileges
-    * May be null to disable dropping privileges
+    * May be omitted to disable dropping privileges
     * If `chrootEnabled` is true calls `chroot` at startup to change root directory to `chrootDirectory`
     * Calls `setgid` at startup with gid for `groupName`
     * Calls `setuid` at startup with uid for `userName`
   * requestLogger
-    * May be null to disable request logging
+    * May be omitted to disable request logging
     * Write request logs to `requestLogFile` (relative to `chrootDirectory`)
   * servers
     * List of server configs
