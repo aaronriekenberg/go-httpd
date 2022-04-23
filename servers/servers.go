@@ -35,11 +35,11 @@ func CreateServers(
 
 			serverInfo := &serverInfo{
 				serverID: serverConfig.ServerID,
+				httpServer: &http.Server{
+					Addr: networkAndListenAddress.ListenAddress,
+				},
 			}
 
-			serverInfo.httpServer = &http.Server{
-				Addr: networkAndListenAddress.ListenAddress,
-			}
 			serverConfig.Timeouts.ApplyToHTTPServer(serverInfo.httpServer)
 
 			tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
@@ -54,18 +54,15 @@ func CreateServers(
 					log.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
 				}
 
-				var tlsConfig tls.Config
-				tlsConfig.Certificates = make([]tls.Certificate, 1)
-				tlsConfig.Certificates[0] = cert
+				tlsConfig := &tls.Config{
+					Certificates: []tls.Certificate{cert},
+					NextProtos:   []string{"h2", "http/1.1"},
+				}
 
-				tlsConfig.NextProtos = append(tlsConfig.NextProtos, "h2", "http/1.1")
-
-				log.Printf("tlsConfig.NextProtos = %q", tlsConfig.NextProtos)
-
-				tlsListener := tls.NewListener(tcpListener, &tlsConfig)
+				tlsListener := tls.NewListener(tcpListener, tlsConfig)
 
 				serverInfo.netListener = tlsListener
-				serverInfo.httpServer.TLSConfig = &tlsConfig
+				serverInfo.httpServer.TLSConfig = tlsConfig
 			}
 
 			networkAndListenAddressToServerInfo[networkAndListenAddress] = serverInfo
