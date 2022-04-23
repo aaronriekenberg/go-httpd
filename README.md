@@ -22,7 +22,7 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
   * `doas rcctl enable gohttpd`
   * `doas rcctl start gohttpd`
 
-## Configuration file sections
+## Configuration
 
 * Example config files in `configfiles` directory
 * Config file sections
