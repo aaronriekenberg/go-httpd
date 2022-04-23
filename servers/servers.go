@@ -6,8 +6,6 @@ import (
 	"net"
 	"net/http"
 
-	gorillaHandlers "github.com/gorilla/handlers"
-
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/handlers"
 	"github.com/aaronriekenberg/go-httpd/requestlogger"
@@ -83,7 +81,7 @@ func StartServers(
 		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
 
 		if requestLogger != nil {
-			handler = gorillaHandlers.CombinedLoggingHandler(requestLogger.Writer, handler)
+			handler = requestLogger.WrapHttpHandler(handler)
 		}
 
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {

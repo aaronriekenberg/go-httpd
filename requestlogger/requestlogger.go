@@ -2,13 +2,20 @@ package requestlogger
 
 import (
 	"io"
+	"net/http"
+
+	gorillaHandlers "github.com/gorilla/handlers"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/aaronriekenberg/go-httpd/config"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type RequestLogger struct {
-	Writer io.WriteCloser
+	writer io.WriteCloser
+}
+
+func (RequestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
+	return gorillaHandlers.CombinedLoggingHandler(RequestLogger.writer, handler)
 }
 
 func CreateRequestLogger(
@@ -20,7 +27,7 @@ func CreateRequestLogger(
 	}
 
 	return &RequestLogger{
-		Writer: &lumberjack.Logger{
+		writer: &lumberjack.Logger{
 			Filename:   requestLoggerConfig.RequestLogFile,
 			MaxSize:    requestLoggerConfig.MaxSizeMegabytes,
 			MaxBackups: requestLoggerConfig.MaxBackups,
