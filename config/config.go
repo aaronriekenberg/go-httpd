@@ -17,6 +17,11 @@ type DirectoryLocation struct {
 	CacheControlValue string `json:"cacheControlValue"`
 	DirectoryPath     string `json:"directoryPath"`
 }
+type CompressedDirectoryLocation struct {
+	StripPrefix       string `json:"stripPrefix"`
+	CacheControlValue string `json:"cacheControlValue"`
+	DirectoryPath     string `json:"directoryPath"`
+}
 
 type RedirectLocation struct {
 	RedirectURL    string `json:"redirectURL"`
@@ -28,11 +33,12 @@ type FastCGILocation struct {
 }
 
 type Location struct {
-	HttpPathPrefix    string             `json:"httpPathPrefix"`
-	BlockedLocation   *BlockedLocation   `json:"blockedLocation"`
-	DirectoryLocation *DirectoryLocation `json:"directoryLocation"`
-	RedirectLocation  *RedirectLocation  `json:"redirectLocation"`
-	FastCGILocation   *FastCGILocation   `json:"fastCGILocation"`
+	HttpPathPrefix              string                       `json:"httpPathPrefix"`
+	BlockedLocation             *BlockedLocation             `json:"blockedLocation"`
+	DirectoryLocation           *DirectoryLocation           `json:"directoryLocation"`
+	CompressedDirectoryLocation *CompressedDirectoryLocation `json:"compressedDirectoryLocation"`
+	RedirectLocation            *RedirectLocation            `json:"redirectLocation"`
+	FastCGILocation             *FastCGILocation             `json:"fastCGILocation"`
 }
 
 type TLSInfo struct {

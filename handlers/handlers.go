@@ -3,10 +3,12 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
 	"github.com/kr/pretty"
+	"github.com/lpar/gzipped/v2"
 	"github.com/yookoala/gofast"
 
 	"github.com/aaronriekenberg/go-httpd/config"
@@ -15,6 +17,15 @@ import (
 type locationHandler struct {
 	httpPathPrefix string
 	httpHandler    http.Handler
+}
+
+func addCacheControlHeader(
+	w http.ResponseWriter,
+	cacheControlValue string,
+) {
+	if len(cacheControlValue) > 0 {
+		w.Header().Add("cache-control", cacheControlValue)
+	}
 }
 
 func createBlockedLocationHandler(
@@ -52,9 +63,47 @@ func createDirectoryLocationHandler(
 
 	handler := http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			if len(directoryLocation.CacheControlValue) > 0 {
-				w.Header().Add("cache-control", directoryLocation.CacheControlValue)
+			addCacheControlHeader(w, directoryLocation.CacheControlValue)
+
+			fileServer.ServeHTTP(w, r)
+		},
+	)
+
+	return locationHandler{
+		httpPathPrefix: httpPathPrefix,
+		httpHandler:    handler,
+	}
+}
+
+func createCompressedDirectoryLocationHandler(
+	httpPathPrefix string,
+	compressedDirectoryLocation config.CompressedDirectoryLocation,
+) locationHandler {
+
+	log.Printf("createCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
+
+	fileServer := http.StripPrefix(
+		compressedDirectoryLocation.StripPrefix,
+		gzipped.FileServer(
+			gzipped.Dir(
+				compressedDirectoryLocation.DirectoryPath,
+			),
+		),
+	)
+
+	handler := http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			addCacheControlHeader(w, compressedDirectoryLocation.CacheControlValue)
+
+			// Unlike http.FileServer, gzipped.FileServer does not serve
+			// index.html for directory requests by default.
+			// See withIndexHTML example:
+			// https://github.com/lpar/gzipped/blob/trunk/README.md
+			if strings.HasSuffix(r.URL.Path, "/") || len(r.URL.Path) == 0 {
+				newpath := path.Join(r.URL.Path, "index.html")
+				r.URL.Path = newpath
 			}
+
 			fileServer.ServeHTTP(w, r)
 		},
 	)
@@ -178,6 +227,15 @@ func CreateLocationsHandler(
 				createDirectoryLocationHandler(
 					location.HttpPathPrefix,
 					*location.DirectoryLocation,
+				),
+			)
+
+		case location.CompressedDirectoryLocation != nil:
+			handler.locationHandlers = append(
+				handler.locationHandlers,
+				createCompressedDirectoryLocationHandler(
+					location.HttpPathPrefix,
+					*location.CompressedDirectoryLocation,
 				),
 			)
 
