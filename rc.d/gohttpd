@@ -3,7 +3,7 @@
 # OpenBSD rc.d file for go-httpd
 # put into /etc/rc.d
 
-daemon="/usr/local/bin/go-httpd"
+daemon="/usr/local/sbin/go-httpd"
 
 . /etc/rc.d/rc.subr
 

@@ -8,7 +8,7 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 * Clone this git repo
 * `make` - build `go-httpd` executable
 * `doas make install`
-  * Install executable to `/usr/local/bin/go-httpd`
+  * Install executable to `/usr/local/sbin/go-httpd`
   * Install rc.d script to `/etc/rc.d/gohttpd`
 * Copy example config file to /etc:
   * `doas cp configfiles/gohttpd.json /etc`
@@ -41,4 +41,4 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
       * `timeouts` read and write timeouts for server sockets
       * `locations` list of location configurations.  Applied in configured order when each request is processed.
         * `httpPathPrefix` url path prefix for matching location
-        * Each `location` contains one of `blockedLocation`, `directoryLocation`, `redirectLocation`, `fastCGILocation`
+        * Each `location` contains one of `blockedLocation`, `directoryLocation`, `compressedDirectoryLocation`, `redirectLocation`, `fastCGILocation`
