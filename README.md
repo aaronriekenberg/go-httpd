@@ -41,4 +41,18 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
       * `timeouts` read and write timeouts for server sockets
       * `locations` list of location configurations.  Applied in configured order when each request is processed.
         * `httpPathPrefix` url path prefix for matching location
-        * Each `location` contains one of `blockedLocation`, `directoryLocation`, `compressedDirectoryLocation`, `redirectLocation`, `fastCGILocation`
+        * Each `location` contains one of the following location types:
+        * `blockedLocation`
+          * Always return the specified `responseStatus` with no body
+        * `directoryLocation`
+          * Use go's `http.FileServer` to serve files in the specified `directoryPath`.  `directoryPath` is relative to `chrootDirectory`
+          * `stripPrefix` may be specified to strip url prefix elements before file serving
+          * `cacheControlValue` may be specified to control the `Cache-Control` response header value
+        * `compressedDirectoryLocation`
+          * Use `github.com/lpar/gzipped/v2` to serve pre-compressed static files ending in `.gz` or `.br` based on `Accept-Encoding` request header
+          * Similar to `gzip-static` option in OpenBSD httpd
+        * `fastCGILocation`
+          * Use `github.com/yookoala/gofast` to connect to a fastcgi application using a unix socket at `unixSocketPath`
+        * `redirectLocation`
+          * Send a redirect response using the specified `redirectURL` and `responseStatus`
+          * `redirectURL` may contain variables `$HTTP_HOST` and `$REQUEST_PATH`
