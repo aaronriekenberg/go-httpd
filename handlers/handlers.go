@@ -31,24 +31,21 @@ func addCacheControlHeader(
 func createBlockedLocationHandler(
 	httpPathPrefix string,
 	blockedLocation config.BlockedLocation,
-) locationHandler {
+) http.Handler {
 
 	log.Printf("createBlockedLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler: http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(blockedLocation.ResponseStatus)
-			},
-		),
-	}
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(blockedLocation.ResponseStatus)
+		},
+	)
 }
 
 func createDirectoryLocationHandler(
 	httpPathPrefix string,
 	directoryLocation config.DirectoryLocation,
-) locationHandler {
+) http.Handler {
 
 	log.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
@@ -61,24 +58,19 @@ func createDirectoryLocationHandler(
 		),
 	)
 
-	handler := http.HandlerFunc(
+	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			addCacheControlHeader(w, directoryLocation.CacheControlValue)
 
 			fileServer.ServeHTTP(w, r)
 		},
 	)
-
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler:    handler,
-	}
 }
 
 func createCompressedDirectoryLocationHandler(
 	httpPathPrefix string,
 	compressedDirectoryLocation config.CompressedDirectoryLocation,
-) locationHandler {
+) http.Handler {
 
 	log.Printf("createCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
@@ -91,7 +83,7 @@ func createCompressedDirectoryLocationHandler(
 		),
 	)
 
-	handler := http.HandlerFunc(
+	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			addCacheControlHeader(w, compressedDirectoryLocation.CacheControlValue)
 
@@ -108,20 +100,16 @@ func createCompressedDirectoryLocationHandler(
 		},
 	)
 
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler:    handler,
-	}
 }
 
 func createRedirectLocationHandler(
 	httpPathPrefix string,
 	redirectLocation config.RedirectLocation,
-) locationHandler {
+) http.Handler {
 
 	log.Printf("createRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
-	handler := http.HandlerFunc(
+	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 
 			if r.URL == nil {
@@ -137,17 +125,12 @@ func createRedirectLocationHandler(
 
 		},
 	)
-
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler:    handler,
-	}
 }
 
 func createFastCGILocationHandler(
 	httpPathPrefix string,
 	fastCGILocation config.FastCGILocation,
-) locationHandler {
+) http.Handler {
 
 	log.Printf("createFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
 
@@ -165,19 +148,14 @@ func createFastCGILocationHandler(
 		10*time.Second, // life span of a client before expire
 	)
 
-	handler := gofast.NewHandler(
+	return gofast.NewHandler(
 		sessionHandler,
 		connectionPool.CreateClient,
 	)
-
-	return locationHandler{
-		httpPathPrefix: httpPathPrefix,
-		httpHandler:    handler,
-	}
 }
 
 type locationListHandler struct {
-	locationHandlers []locationHandler
+	locationHandlers []*locationHandler
 }
 
 func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -203,63 +181,68 @@ func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter,
 	handler.ServeHTTP(w, r)
 }
 
+func createHandlerForLocation(
+	locationConfig config.Location,
+) http.Handler {
+
+	var locationHandler http.Handler
+
+	switch {
+	case locationConfig.BlockedLocation != nil:
+		locationHandler = createBlockedLocationHandler(
+			locationConfig.HttpPathPrefix,
+			*locationConfig.BlockedLocation,
+		)
+
+	case locationConfig.DirectoryLocation != nil:
+		locationHandler = createDirectoryLocationHandler(
+			locationConfig.HttpPathPrefix,
+			*locationConfig.DirectoryLocation,
+		)
+
+	case locationConfig.CompressedDirectoryLocation != nil:
+		locationHandler = createCompressedDirectoryLocationHandler(
+			locationConfig.HttpPathPrefix,
+			*locationConfig.CompressedDirectoryLocation,
+		)
+
+	case locationConfig.RedirectLocation != nil:
+		locationHandler = createRedirectLocationHandler(
+			locationConfig.HttpPathPrefix,
+			*locationConfig.RedirectLocation,
+		)
+
+	case locationConfig.FastCGILocation != nil:
+		locationHandler = createFastCGILocationHandler(
+			locationConfig.HttpPathPrefix,
+			*locationConfig.FastCGILocation,
+		)
+
+	}
+
+	if locationHandler == nil {
+		log.Fatalf("invalid location config: \n%# v", pretty.Formatter(locationConfig))
+	}
+
+	return locationHandler
+}
+
 func CreateLocationsHandler(
 	locations []config.Location,
 ) http.Handler {
 
 	handler := &locationListHandler{}
 
-	for _, location := range locations {
+	for _, locationConfig := range locations {
 
-		switch {
-		case location.BlockedLocation != nil:
-			handler.locationHandlers = append(
-				handler.locationHandlers,
-				createBlockedLocationHandler(
-					location.HttpPathPrefix,
-					*location.BlockedLocation,
-				),
-			)
+		handler.locationHandlers = append(
+			handler.locationHandlers,
+			&locationHandler{
+				httpPathPrefix: locationConfig.HttpPathPrefix,
+				httpHandler:    createHandlerForLocation(locationConfig),
+			},
+		)
 
-		case location.DirectoryLocation != nil:
-			handler.locationHandlers = append(
-				handler.locationHandlers,
-				createDirectoryLocationHandler(
-					location.HttpPathPrefix,
-					*location.DirectoryLocation,
-				),
-			)
-
-		case location.CompressedDirectoryLocation != nil:
-			handler.locationHandlers = append(
-				handler.locationHandlers,
-				createCompressedDirectoryLocationHandler(
-					location.HttpPathPrefix,
-					*location.CompressedDirectoryLocation,
-				),
-			)
-
-		case location.RedirectLocation != nil:
-			handler.locationHandlers = append(
-				handler.locationHandlers,
-				createRedirectLocationHandler(
-					location.HttpPathPrefix,
-					*location.RedirectLocation,
-				),
-			)
-
-		case location.FastCGILocation != nil:
-			handler.locationHandlers = append(
-				handler.locationHandlers,
-				createFastCGILocationHandler(
-					location.HttpPathPrefix,
-					*location.FastCGILocation,
-				),
-			)
-
-		default:
-			log.Fatalf("invalid location config: \n%# v", pretty.Formatter(location))
-		}
 	}
 
 	return handler
