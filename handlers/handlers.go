@@ -107,11 +107,6 @@ func createRedirectLocationHandler(
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 
-			if r.URL == nil {
-				http.Error(w, "request url is nil in redirect handler", http.StatusInternalServerError)
-				return
-			}
-
 			redirectURL := redirectLocation.RedirectURL
 			redirectURL = strings.ReplaceAll(redirectURL, "$HTTP_HOST", r.Host)
 			redirectURL = strings.ReplaceAll(redirectURL, "$REQUEST_PATH", r.URL.Path)
