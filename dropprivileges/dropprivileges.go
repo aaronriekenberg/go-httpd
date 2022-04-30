@@ -14,65 +14,50 @@ func DropPrivileges(
 	config *config.DropPrivileges,
 ) {
 
-	log.Printf("begin DropPrivileges")
-
 	if config == nil {
-		log.Printf("DropPrivileges config is nil returning")
 		return
 	}
 
 	userObject, err := user.Lookup(config.UserName)
 	if err != nil {
-		log.Fatalf("Lookup failed: %q", config.UserName)
+		log.Fatalf("user.Lookup failed config.UserName = %q error: %v", config.UserName, err)
 	}
-	log.Printf("got userObject %+v", userObject)
 
 	uidInt, err := strconv.Atoi(userObject.Uid)
 	if err != nil {
 		log.Fatalf("strconv.Atoi userObject.Uid = %q error: %v", userObject.Uid, err)
 	}
-	log.Printf("uidInt = %v", uidInt)
 
 	groupObject, err := user.LookupGroup(config.GroupName)
 	if err != nil {
-		log.Fatalf("LookupGroup failed: %q", config.GroupName)
+		log.Fatalf("user.LookupGroup failed config.GroupName =  %q error: %v", config.GroupName, err)
 	}
-	log.Printf("got groupObject %+v", groupObject)
 
 	gidInt, err := strconv.Atoi(groupObject.Gid)
 	if err != nil {
 		log.Fatalf("strconv.Atoi groupObject.Gid = %q error: %v", groupObject.Gid, err)
 	}
-	log.Printf("gidInt = %v", gidInt)
 
 	if config.ChrootEnabled {
-		log.Printf("Chroot to %q", config.ChrootDirectory)
-		err := syscall.Chroot(config.ChrootDirectory)
-		if err != nil {
-			log.Fatalf("Chroot failed: %v", err)
+		if err := syscall.Chroot(config.ChrootDirectory); err != nil {
+			log.Fatalf("Chroot failed error: %v", err)
 		}
 
-		err = os.Chdir("/")
-		if err != nil {
-			log.Fatalf("Chdir / failed: %v", err)
+		if err := os.Chdir("/"); err != nil {
+			log.Fatalf("Chdir / failed error: %v", err)
 		}
 	}
 
-	err = syscall.Setgroups([]int{gidInt})
-	if err != nil {
+	if err := syscall.Setgroups([]int{gidInt}); err != nil {
 		log.Fatalf("syscall.Setgroups %v error: %v", []int{gidInt}, err)
 	}
 
-	err = syscall.Setgid(gidInt)
-	if err != nil {
+	if err := syscall.Setgid(gidInt); err != nil {
 		log.Fatalf("syscall.Setgid gitInt = %v error: %v", gidInt, err)
 	}
 
-	err = syscall.Setuid(uidInt)
-	if err != nil {
+	if err := syscall.Setuid(uidInt); err != nil {
 		log.Fatalf("syscall.Setuid uidInt = %v error: %v", uidInt, err)
 	}
-
-	log.Printf("end DropPrivileges")
 
 }
