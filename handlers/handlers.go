@@ -14,11 +14,6 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 )
 
-type locationHandler struct {
-	httpPathPrefix string
-	httpHandler    http.Handler
-}
-
 func addCacheControlHeader(
 	w http.ResponseWriter,
 	cacheControlValue string,
@@ -154,31 +149,49 @@ func createFastCGILocationHandler(
 	)
 }
 
+type requestMatcher struct {
+	httpPathPrefix string
+}
+
+func newRequestMatcher(
+	httpPathPrefix string,
+) requestMatcher {
+	return requestMatcher{
+		httpPathPrefix: httpPathPrefix,
+	}
+}
+
+func (requestMatcher *requestMatcher) matches(r *http.Request) bool {
+	return strings.HasPrefix(r.URL.Path, requestMatcher.httpPathPrefix)
+}
+
+type locationHandler struct {
+	requestMatcher
+	http.Handler
+}
+
 type locationListHandler struct {
 	locationHandlers []*locationHandler
 }
 
 func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	requestURLPath := r.URL.Path
 
-	var handler http.Handler
+	var matchingLocationHandler *locationHandler
 
 	for _, locationHandler := range locationListHandler.locationHandlers {
 
-		match := strings.HasPrefix(requestURLPath, locationHandler.httpPathPrefix)
-
-		if match {
-			handler = locationHandler.httpHandler
+		if locationHandler.matches(r) {
+			matchingLocationHandler = locationHandler
 			break
 		}
 	}
 
-	if handler == nil {
+	if matchingLocationHandler == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	handler.ServeHTTP(w, r)
+	matchingLocationHandler.ServeHTTP(w, r)
 }
 
 func createHandlerForLocation(
@@ -238,8 +251,8 @@ func CreateLocationsHandler(
 		handler.locationHandlers = append(
 			handler.locationHandlers,
 			&locationHandler{
-				httpPathPrefix: locationConfig.HttpPathPrefix,
-				httpHandler:    createHandlerForLocation(locationConfig),
+				requestMatcher: newRequestMatcher(locationConfig.HttpPathPrefix),
+				Handler:        createHandlerForLocation(locationConfig),
 			},
 		)
 
