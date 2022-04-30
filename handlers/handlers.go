@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -12,7 +11,10 @@ import (
 	"github.com/yookoala/gofast"
 
 	"github.com/aaronriekenberg/go-httpd/config"
+	"github.com/aaronriekenberg/go-httpd/logging"
 )
+
+var logger = logging.GetLogger()
 
 func addCacheControlHeader(
 	w http.ResponseWriter,
@@ -28,7 +30,7 @@ func createBlockedLocationHandler(
 	blockedLocation config.BlockedLocation,
 ) http.Handler {
 
-	log.Printf("createBlockedLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("createBlockedLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +44,7 @@ func createDirectoryLocationHandler(
 	directoryLocation config.DirectoryLocation,
 ) http.Handler {
 
-	log.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	fileServer := http.StripPrefix(
 		directoryLocation.StripPrefix,
@@ -67,7 +69,7 @@ func createCompressedDirectoryLocationHandler(
 	compressedDirectoryLocation config.CompressedDirectoryLocation,
 ) http.Handler {
 
-	log.Printf("createCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("createCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	fileServer := http.StripPrefix(
 		compressedDirectoryLocation.StripPrefix,
@@ -102,7 +104,7 @@ func createRedirectLocationHandler(
 	redirectLocation config.RedirectLocation,
 ) http.Handler {
 
-	log.Printf("createRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("createRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +124,7 @@ func createFastCGILocationHandler(
 	fastCGILocation config.FastCGILocation,
 ) http.Handler {
 
-	log.Printf("createFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("createFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	sessionHandler := gofast.Chain(
 		gofast.BasicParamsMap, // maps common CGI parameters
@@ -229,7 +231,7 @@ func createHandlerForLocation(
 	}
 
 	if locationHandler == nil {
-		log.Fatalf("invalid location config: \n%# v", pretty.Formatter(locationConfig))
+		logger.Fatalf("invalid location config: \n%# v", pretty.Formatter(locationConfig))
 	}
 
 	return locationHandler

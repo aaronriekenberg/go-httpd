@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"flag"
 	"os"
 	"os/signal"
 	"runtime"
@@ -11,32 +11,35 @@ import (
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/dropprivileges"
+	"github.com/aaronriekenberg/go-httpd/logging"
 	"github.com/aaronriekenberg/go-httpd/requestlogger"
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
 
 var gitCommit string
 
+var logger = logging.GetLogger()
+
 func awaitShutdownSignal() {
 	sig := make(chan os.Signal, 2)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	s := <-sig
-	log.Fatalf("Signal (%v) received, stopping", s)
+	logger.Fatalf("Signal (%v) received, stopping", s)
 }
 
 func main() {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	configFilePath := flag.String("f", "/etc/gohttpd.json", "config file path")
+	verboseFlag := flag.Bool("v", false, "enable verbose logging")
 
-	log.Printf("go version = %q gitCommit = %q", runtime.Version(), gitCommit)
+	flag.Parse()
 
-	if len(os.Args) != 2 {
-		log.Fatalf("Usage: %v <config json file>", os.Args[0])
-	}
+	logging.SetVerbose(*verboseFlag)
 
-	configFile := os.Args[1]
+	logger.Printf("go version = %q gitCommit = %q", runtime.Version(), gitCommit)
+	logger.Printf("verboseFlag = %v configFilePath = %q", *verboseFlag, *configFilePath)
 
-	configuration := config.ReadConfiguration(configFile)
-	log.Printf("configuration:\n%# v", pretty.Formatter(configuration))
+	configuration := config.ReadConfiguration(*configFilePath)
+	logger.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
 	servers.CreateServers(configuration.Servers)
 

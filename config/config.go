@@ -2,11 +2,14 @@ package config
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/aaronriekenberg/go-httpd/logging"
 )
+
+var logger = logging.GetLogger()
 
 type BlockedLocation struct {
 	ResponseStatus int `json:"responseStatus"`
@@ -59,7 +62,7 @@ func (timeouts *Timeouts) ApplyToHTTPServer(httpServer *http.Server) {
 	httpServer.ReadTimeout = time.Duration(timeouts.ReadTimeoutMilliseconds) * time.Millisecond
 	httpServer.WriteTimeout = time.Duration(timeouts.WriteTimeoutMilliseconds) * time.Millisecond
 
-	log.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
+	logger.Printf("set httpServer.ReadTimeout = %v httpServer.WriteTimeout = %v", httpServer.ReadTimeout, httpServer.WriteTimeout)
 }
 
 type DropPrivileges struct {
@@ -95,16 +98,16 @@ type Configuration struct {
 }
 
 func ReadConfiguration(configFile string) *Configuration {
-	log.Printf("reading json file %v", configFile)
+	logger.Printf("reading json file %v", configFile)
 
 	source, err := os.ReadFile(configFile)
 	if err != nil {
-		log.Fatalf("error reading %v: %v", configFile, err)
+		logger.Fatalf("error reading %v: %v", configFile, err)
 	}
 
 	var config Configuration
 	if err = json.Unmarshal(source, &config); err != nil {
-		log.Fatalf("error parsing %v: %v", configFile, err)
+		logger.Fatalf("error parsing %v: %v", configFile, err)
 	}
 
 	return &config

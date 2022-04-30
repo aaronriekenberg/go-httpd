@@ -2,14 +2,16 @@ package servers
 
 import (
 	"crypto/tls"
-	"log"
 	"net"
 	"net/http"
 
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/handlers"
+	"github.com/aaronriekenberg/go-httpd/logging"
 	"github.com/aaronriekenberg/go-httpd/requestlogger"
 )
+
+var logger = logging.GetLogger()
 
 type serverInfo struct {
 	serverID    string
@@ -22,13 +24,13 @@ var networkAndListenAddressToServerInfo = map[config.NetworkAndListenAddress]*se
 func CreateServers(
 	servers []config.Server,
 ) {
-	log.Printf("begin CreateServers")
+	logger.Printf("begin CreateServers")
 
 	for _, serverConfig := range servers {
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
 
 			if _, exists := networkAndListenAddressToServerInfo[networkAndListenAddress]; exists {
-				log.Fatalf("duplicate networkAndListenAddress %q", networkAndListenAddress)
+				logger.Fatalf("duplicate networkAndListenAddress %q", networkAndListenAddress)
 			}
 
 			serverInfo := &serverInfo{
@@ -42,14 +44,14 @@ func CreateServers(
 
 			tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
 			if err != nil {
-				log.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
+				logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
 			}
 			serverInfo.netListener = tcpListener
 
 			if serverConfig.TLSInfo != nil {
 				cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
 				if err != nil {
-					log.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
+					logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
 				}
 
 				tlsConfig := &tls.Config{
@@ -67,16 +69,18 @@ func CreateServers(
 
 		}
 	}
+
+	logger.Printf("end CreateServers")
 }
 
 func StartServers(
 	servers []config.Server,
 	requestLogger *requestlogger.RequestLogger,
 ) {
-	log.Printf("begin StartServers")
+	logger.Printf("begin StartServers")
 
 	for _, serverConfig := range servers {
-		log.Printf("StartServers serverID %q", serverConfig.ServerID)
+		logger.Printf("StartServers serverID %q", serverConfig.ServerID)
 
 		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
 
@@ -92,7 +96,7 @@ func StartServers(
 		}
 	}
 
-	log.Printf("end StartServers")
+	logger.Printf("end StartServers")
 }
 
 func runServer(
@@ -102,16 +106,16 @@ func runServer(
 
 	serverInfo, ok := networkAndListenAddressToServerInfo[networkAndListenAddress]
 	if !ok {
-		log.Fatalf("unable to find serverInfo networkAndListenAddress = %+v", networkAndListenAddress)
+		logger.Fatalf("unable to find serverInfo networkAndListenAddress = %+v", networkAndListenAddress)
 	}
 
 	httpServer := serverInfo.httpServer
 	httpServer.Handler = handler
 
-	log.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
+	logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
 
 	err := httpServer.Serve(serverInfo.netListener)
 
-	log.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
+	logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
 
 }
