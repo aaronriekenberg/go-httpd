@@ -13,8 +13,6 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 * Copy example config file to /etc:
   * `doas cp configfiles/gohttpd.json /etc`
   * Modify `/etc/gohttpd.json` as needed
-* Set rcctl flag for config file path
-  * `doas rcctl set flags gohttpd /etc/gohttpd.json`
 * Create directory for request logs if enabled
   * `doas mkdir -p /var/www/gohttpd-logs`
   * `doas chown www:www /var/www/gohttpd-logs`
@@ -22,7 +20,12 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
   * `doas rcctl enable gohttpd`
   * `doas rcctl start gohttpd`
 
-## Configuration
+## Command Line Arguments
+
+* -f <config file path> override default config file path `/etc/gohttpd.json`
+* -v enable verbose logging
+
+## Configuration File
 
 * Example config files in `configfiles` directory
 * Config file sections
