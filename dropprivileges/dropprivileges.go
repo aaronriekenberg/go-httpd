@@ -30,7 +30,7 @@ func DropPrivileges(
 
 	groupObject, err := user.LookupGroup(config.GroupName)
 	if err != nil {
-		log.Fatalf("user.LookupGroup failed config.GroupName =  %q error: %v", config.GroupName, err)
+		log.Fatalf("user.LookupGroup failed config.GroupName = %q error: %v", config.GroupName, err)
 	}
 
 	gidInt, err := strconv.Atoi(groupObject.Gid)
