@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type LoggerInterface interface {
+type Logger interface {
 	Printf(format string, v ...interface{})
 
 	Fatalf(format string, v ...interface{})
@@ -32,7 +32,7 @@ func SetVerbose(verbose bool) {
 	loggerInstance.verbose = verbose
 }
 
-func GetLogger() LoggerInterface {
+func GetLogger() Logger {
 	return &loggerInstance
 }
 
