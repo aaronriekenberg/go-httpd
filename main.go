@@ -72,7 +72,7 @@ func main() {
 
 	commandLineFlags := processCommandLineFlags()
 
-	logging.SetVerbose(commandLineFlags.verbose)
+	logger.SetVerboseEnabled(commandLineFlags.verbose)
 
 	logger.Printf("starting %v", getAppName())
 	logger.Printf("commandLineFlags = %+v", commandLineFlags)

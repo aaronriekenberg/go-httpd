@@ -6,47 +6,55 @@ import (
 	"os"
 )
 
-type Logger interface {
+type VerboseLogger interface {
 	// Printf is silent if verbose = false.
 	Printf(format string, v ...interface{})
 
+	// Enable or disable verbose logging.
+	SetVerboseEnabled(verboseEnabled bool)
+}
+
+type FatalLogger interface {
 	// Fatalf always calls log.Fatalf to log and exit.
 	Fatalf(format string, v ...interface{})
 }
 
+type Logger interface {
+	VerboseLogger
+	FatalLogger
+}
+
+type verboseLogger struct {
+	*log.Logger
+}
+
+func (verboseLogger *verboseLogger) SetVerboseEnabled(verboseEnabled bool) {
+	if verboseEnabled {
+		verboseLogger.SetOutput(os.Stdout)
+	} else {
+		verboseLogger.SetOutput(io.Discard)
+	}
+}
+
 type logger struct {
-	printfLogger *log.Logger
-	fatalfLogger *log.Logger
-}
-
-func (logger *logger) Printf(format string, v ...interface{}) {
-	logger.printfLogger.Printf(format, v...)
-}
-
-func (logger *logger) Fatalf(format string, v ...interface{}) {
-	logger.fatalfLogger.Fatalf(format, v...)
+	VerboseLogger
+	FatalLogger
 }
 
 var loggerInstance logger
-
-func SetVerbose(verbose bool) {
-	if verbose {
-		loggerInstance.printfLogger.SetOutput(os.Stdout)
-	} else {
-		loggerInstance.printfLogger.SetOutput(io.Discard)
-	}
-}
 
 func GetLogger() Logger {
 	return &loggerInstance
 }
 
 func init() {
-	printfLogger := log.New(os.Stdout, "[debug] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
-	fatalfLogger := log.New(os.Stderr, "[fatal] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
+	actualVerboseLogger := log.New(os.Stdout, "[verbose] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
+	actualFatalLogger := log.New(os.Stderr, "[fatal] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
 
 	loggerInstance = logger{
-		printfLogger: printfLogger,
-		fatalfLogger: fatalfLogger,
+		VerboseLogger: &verboseLogger{
+			Logger: actualVerboseLogger,
+		},
+		FatalLogger: actualFatalLogger,
 	}
 }
