@@ -1,4 +1,4 @@
-package requestlogger
+package requestlogging
 
 import (
 	"io"

@@ -8,7 +8,7 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/handlers"
 	"github.com/aaronriekenberg/go-httpd/logging"
-	"github.com/aaronriekenberg/go-httpd/requestlogger"
+	"github.com/aaronriekenberg/go-httpd/requestlogging"
 )
 
 var logger = logging.GetLogger()
@@ -75,7 +75,7 @@ func CreateServers(
 
 func StartServers(
 	servers []config.Server,
-	requestLogger *requestlogger.RequestLogger,
+	requestLogger *requestlogging.RequestLogger,
 ) {
 	logger.Printf("begin StartServers")
 
