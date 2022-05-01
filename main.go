@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
@@ -20,25 +21,63 @@ var gitCommit string
 
 var logger = logging.GetLogger()
 
-func awaitShutdownSignal() {
-	sig := make(chan os.Signal, 2)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	s := <-sig
-	logger.Fatalf("Signal (%v) received, stopping", s)
+func getAppName() string {
+	return fmt.Sprintf(
+		"%v (go version = %q gitCommit = %q)",
+		os.Args[0],
+		runtime.Version(),
+		gitCommit,
+	)
 }
 
-func main() {
-	configFilePath := flag.String("f", "/etc/gohttpd.json", "config file path")
-	verboseFlag := flag.Bool("v", false, "enable verbose logging")
+type commandLineFlags struct {
+	configFilePath string
+	verbose        bool
+}
+
+func processCommandLineFlags() commandLineFlags {
+	commandLineFlags := commandLineFlags{}
+
+	flag.StringVar(
+		&commandLineFlags.configFilePath,
+		"f",
+		"/etc/gohttpd.json",
+		"config file path",
+	)
+
+	flag.BoolVar(
+		&commandLineFlags.verbose,
+		"v",
+		false,
+		"enable verbose logging",
+	)
+
+	flag.Usage = func() {
+
+		fmt.Fprintf(
+			flag.CommandLine.Output(),
+			"Usage of %v:\n",
+			getAppName(),
+		)
+
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
-	logging.SetVerbose(*verboseFlag)
+	return commandLineFlags
+}
 
-	logger.Printf("go version = %q gitCommit = %q", runtime.Version(), gitCommit)
-	logger.Printf("verboseFlag = %v configFilePath = %q", *verboseFlag, *configFilePath)
+func main() {
 
-	configuration := config.ReadConfiguration(*configFilePath)
+	commandLineFlags := processCommandLineFlags()
+
+	logging.SetVerbose(commandLineFlags.verbose)
+
+	logger.Printf("starting %v", getAppName())
+	logger.Printf("commandLineFlags = %+v", commandLineFlags)
+
+	configuration := config.ReadConfiguration(commandLineFlags.configFilePath)
 	logger.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
 	servers.CreateServers(configuration.Servers)
@@ -53,4 +92,11 @@ func main() {
 	)
 
 	awaitShutdownSignal()
+}
+
+func awaitShutdownSignal() {
+	sig := make(chan os.Signal, 2)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	s := <-sig
+	logger.Fatalf("Signal (%v) received, stopping", s)
 }
