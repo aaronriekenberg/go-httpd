@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"io"
 	"log"
 	"os"
 )
@@ -14,24 +15,26 @@ type Logger interface {
 }
 
 type logger struct {
-	actualLogger *log.Logger
-	verbose      bool
+	printfLogger *log.Logger
+	fatalfLogger *log.Logger
 }
 
 func (logger *logger) Printf(format string, v ...interface{}) {
-	if logger.verbose {
-		logger.actualLogger.Printf(format, v...)
-	}
+	logger.printfLogger.Printf(format, v...)
 }
 
 func (logger *logger) Fatalf(format string, v ...interface{}) {
-	logger.actualLogger.Fatalf(format, v...)
+	logger.fatalfLogger.Fatalf(format, v...)
 }
 
 var loggerInstance logger
 
 func SetVerbose(verbose bool) {
-	loggerInstance.verbose = verbose
+	if verbose {
+		loggerInstance.printfLogger.SetOutput(os.Stdout)
+	} else {
+		loggerInstance.printfLogger.SetOutput(io.Discard)
+	}
 }
 
 func GetLogger() Logger {
@@ -39,10 +42,11 @@ func GetLogger() Logger {
 }
 
 func init() {
-	actualLogger := log.New(os.Stderr, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	printfLogger := log.New(os.Stdout, "[debug] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
+	fatalfLogger := log.New(os.Stderr, "[fatal] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
 
 	loggerInstance = logger{
-		actualLogger: actualLogger,
-		verbose:      true,
+		printfLogger: printfLogger,
+		fatalfLogger: fatalfLogger,
 	}
 }
