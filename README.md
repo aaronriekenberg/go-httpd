@@ -22,8 +22,9 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 
 ## Command Line Arguments
 
-* -f <config file path> override default config file path `/etc/gohttpd.json`
-* -v enable verbose logging
+* `-h` show usage and exit
+* `-f <config file path>` override default config file path `/etc/gohttpd.json`
+* `-v` enable verbose logging
 
 ## Configuration File
 
