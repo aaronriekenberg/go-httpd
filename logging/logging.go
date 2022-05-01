@@ -6,8 +6,10 @@ import (
 )
 
 type Logger interface {
+	// Printf is silent if verbose = false.
 	Printf(format string, v ...interface{})
 
+	// Fatalf always calls log.Fatalf to log and exit.
 	Fatalf(format string, v ...interface{})
 }
 
