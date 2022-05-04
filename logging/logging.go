@@ -7,7 +7,7 @@ import (
 )
 
 type VerboseLogger interface {
-	// Printf is silent if verbose = false.
+	// Printf is silent if verbose logging is disabled.
 	Printf(format string, v ...interface{})
 
 	// Enable or disable verbose logging.
@@ -28,12 +28,22 @@ type verboseLogger struct {
 	*log.Logger
 }
 
+func newVerboseLogger() VerboseLogger {
+	return &verboseLogger{
+		Logger: log.New(os.Stdout, "[verbose] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix),
+	}
+}
+
 func (verboseLogger *verboseLogger) SetVerboseEnabled(verboseEnabled bool) {
 	if verboseEnabled {
 		verboseLogger.SetOutput(os.Stdout)
 	} else {
 		verboseLogger.SetOutput(io.Discard)
 	}
+}
+
+func newFatalLogger() FatalLogger {
+	return log.New(os.Stderr, "[fatal] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
 }
 
 type logger struct {
@@ -48,13 +58,8 @@ func GetLogger() Logger {
 }
 
 func init() {
-	actualVerboseLogger := log.New(os.Stdout, "[verbose] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
-	actualFatalLogger := log.New(os.Stderr, "[fatal] ", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lmsgprefix)
-
 	loggerInstance = logger{
-		VerboseLogger: &verboseLogger{
-			Logger: actualVerboseLogger,
-		},
-		FatalLogger: actualFatalLogger,
+		VerboseLogger: newVerboseLogger(),
+		FatalLogger:   newFatalLogger(),
 	}
 }
