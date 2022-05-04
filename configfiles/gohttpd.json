@@ -85,7 +85,8 @@
                 {
                     "httpPathPrefix": "/cgi-bin/",
                     "fastCGILocation": {
-                        "unixSocketPath": "/run/go-fastcgi/socket"
+                        "unixSocketPath": "/run/go-fastcgi/socket",
+                        "cacheControlValue": "no-cache"
                     }
                 },
                 {
