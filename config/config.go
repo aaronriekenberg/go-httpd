@@ -12,23 +12,25 @@ import (
 var logger = logging.GetLogger()
 
 type BlockedLocation struct {
-	ResponseStatus int `json:"responseStatus"`
+	ResponseStatus    int    `json:"responseStatus"`
+	CacheControlValue string `json:"cacheControlValue"`
 }
 
 type DirectoryLocation struct {
 	StripPrefix       string `json:"stripPrefix"`
-	CacheControlValue string `json:"cacheControlValue"`
 	DirectoryPath     string `json:"directoryPath"`
+	CacheControlValue string `json:"cacheControlValue"`
 }
 type CompressedDirectoryLocation struct {
 	StripPrefix       string `json:"stripPrefix"`
-	CacheControlValue string `json:"cacheControlValue"`
 	DirectoryPath     string `json:"directoryPath"`
+	CacheControlValue string `json:"cacheControlValue"`
 }
 
 type RedirectLocation struct {
-	RedirectURL    string `json:"redirectURL"`
-	ResponseStatus int    `json:"responseStatus"`
+	RedirectURL       string `json:"redirectURL"`
+	ResponseStatus    int    `json:"responseStatus"`
+	CacheControlValue string `json:"cacheControlValue"`
 }
 
 type FastCGILocation struct {

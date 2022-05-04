@@ -32,15 +32,16 @@
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "cacheControlValue": "max-age=0",
-                        "directoryPath": "/acme"
+                        "directoryPath": "/acme",
+                        "cacheControlValue": "no-cache"
                     }
                 },
                 {
                     "httpPathPrefix": "",
                     "redirectLocation": {
                         "redirectURL": "https://$HTTP_HOST$REQUEST_PATH",
-                        "responseStatus": 302
+                        "responseStatus": 302,
+                        "cacheControlValue": "no-cache"
                     }
                 }
             ]
@@ -69,15 +70,16 @@
                 {
                     "httpPathPrefix": "/.git",
                     "blockedLocation": {
-                        "responseStatus": 403
+                        "responseStatus": 403,
+                        "cacheControlValue": "no-cache"
                     }
                 },
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "cacheControlValue": "max-age=0",
-                        "directoryPath": "/acme"
+                        "directoryPath": "/acme",
+                        "cacheControlValue": "no-cache"
                     }
                 },
                 {
@@ -89,8 +91,8 @@
                 {
                     "httpPathPrefix": "",
                     "compressedDirectoryLocation": {
-                        "cacheControlValue": "public, max-age=150",
-                        "directoryPath": "/htdocs/aaronr.digital"
+                        "directoryPath": "/htdocs/aaronr.digital",
+                        "cacheControlValue": "public, max-age=150"
                     }
                 }
             ]

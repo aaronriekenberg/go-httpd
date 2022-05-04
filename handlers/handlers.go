@@ -16,12 +16,12 @@ import (
 
 var logger = logging.GetLogger()
 
-func addCacheControlHeader(
+func setCacheControlHeader(
 	w http.ResponseWriter,
 	cacheControlValue string,
 ) {
 	if len(cacheControlValue) > 0 {
-		w.Header().Add("cache-control", cacheControlValue)
+		w.Header().Set("cache-control", cacheControlValue)
 	}
 }
 
@@ -34,6 +34,8 @@ func createBlockedLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			setCacheControlHeader(w, blockedLocation.CacheControlValue)
+
 			w.WriteHeader(blockedLocation.ResponseStatus)
 		},
 	)
@@ -57,7 +59,7 @@ func createDirectoryLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			addCacheControlHeader(w, directoryLocation.CacheControlValue)
+			setCacheControlHeader(w, directoryLocation.CacheControlValue)
 
 			fileServer.ServeHTTP(w, r)
 		},
@@ -82,7 +84,7 @@ func createCompressedDirectoryLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			addCacheControlHeader(w, compressedDirectoryLocation.CacheControlValue)
+			setCacheControlHeader(w, compressedDirectoryLocation.CacheControlValue)
 
 			// Unlike http.FileServer, gzipped.FileServer does not serve
 			// index.html for directory requests by default.
@@ -108,6 +110,7 @@ func createRedirectLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			setCacheControlHeader(w, redirectLocation.CacheControlValue)
 
 			redirectURL := redirectLocation.RedirectURL
 			redirectURL = strings.ReplaceAll(redirectURL, "$HTTP_HOST", r.Host)

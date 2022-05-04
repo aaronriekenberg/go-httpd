@@ -22,14 +22,15 @@
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "/Users/aaron/acme"
+                        "directoryPath": "/Users/aaron/acme",
+                        "cacheControlValue": "no-cache"
                     }
                 },
                 {
                     "httpPathPrefix": "",
                     "directoryLocation": {
-                        "cacheControlValue": "public, max-age=150",
-                        "directoryPath": "."
+                        "directoryPath": ".",
+                        "cacheControlValue": "public, max-age=150"
                     }
                 }
             ]
