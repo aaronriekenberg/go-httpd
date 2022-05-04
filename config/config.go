@@ -21,6 +21,7 @@ type DirectoryLocation struct {
 	DirectoryPath     string `json:"directoryPath"`
 	CacheControlValue string `json:"cacheControlValue"`
 }
+
 type CompressedDirectoryLocation struct {
 	StripPrefix       string `json:"stripPrefix"`
 	DirectoryPath     string `json:"directoryPath"`
