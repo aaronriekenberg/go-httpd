@@ -51,15 +51,11 @@ type logger struct {
 	FatalLogger
 }
 
-var loggerInstance logger
+var loggerInstance = logger{
+	VerboseLogger: newVerboseLogger(),
+	FatalLogger:   newFatalLogger(),
+}
 
 func GetLogger() Logger {
 	return &loggerInstance
-}
-
-func init() {
-	loggerInstance = logger{
-		VerboseLogger: newVerboseLogger(),
-		FatalLogger:   newFatalLogger(),
-	}
 }
