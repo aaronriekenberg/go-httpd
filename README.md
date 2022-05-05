@@ -47,6 +47,7 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
       * Each `location` contains one of the following location types:
       * `blockedLocation`
         * Always return the specified `responseStatus` with no body
+        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
       * `directoryLocation`
         * Use go's `http.FileServer` to serve files in the specified `directoryPath` 
         * `directoryPath` is relative to `chrootDirectory`
@@ -55,8 +56,11 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
       * `compressedDirectoryLocation`
         * Use `github.com/lpar/gzipped/v2` to serve pre-compressed static files ending in `.gz` or `.br` based on `Accept-Encoding` request header
         * Similar to `gzip-static` option in OpenBSD httpd
+        * Configuration fields are the same as `directoryLocation`
       * `fastCGILocation`
         * Use `github.com/yookoala/gofast` to connect to a fastcgi application using a unix socket at `unixSocketPath`
+        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
       * `redirectLocation`
         * Send a redirect response using the specified `redirectURL` and `responseStatus`
         * `redirectURL` may contain variables `$HTTP_HOST` and `$REQUEST_PATH`
+        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
