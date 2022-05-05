@@ -37,7 +37,6 @@
                     }
                 },
                 {
-                    "httpPathPrefix": "",
                     "redirectLocation": {
                         "redirectURL": "https://$HTTP_HOST$REQUEST_PATH",
                         "responseStatus": 302,
@@ -90,7 +89,6 @@
                     }
                 },
                 {
-                    "httpPathPrefix": "",
                     "compressedDirectoryLocation": {
                         "directoryPath": "/htdocs/aaronr.digital",
                         "cacheControlValue": "public, max-age=150"

@@ -27,7 +27,6 @@
                     }
                 },
                 {
-                    "httpPathPrefix": "",
                     "directoryLocation": {
                         "directoryPath": ".",
                         "cacheControlValue": "public, max-age=150"
