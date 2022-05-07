@@ -30,7 +30,7 @@ func CreateServers(
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
 
 			if _, exists := networkAndListenAddressToServerInfo[networkAndListenAddress]; exists {
-				logger.Fatalf("duplicate networkAndListenAddress %q", networkAndListenAddress)
+				logger.Fatalf("duplicate networkAndListenAddress %+v", networkAndListenAddress)
 			}
 
 			serverInfo := &serverInfo{
