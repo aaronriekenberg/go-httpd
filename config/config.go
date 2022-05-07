@@ -77,6 +77,7 @@ type DropPrivileges struct {
 }
 
 type RequestLogger struct {
+	LogToStdout      bool   `json:"logToStdout"`
 	RequestLogFile   string `json:"requestLogFile"`
 	MaxSizeMegabytes int    `json:"maxSizeMegabytes"`
 	MaxBackups       int    `json:"maxBackups"`

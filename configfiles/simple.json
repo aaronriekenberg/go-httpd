@@ -1,8 +1,6 @@
 {
     "requestLogger": {
-        "requestLogFile": "request.log",
-        "maxSizeMegabytes": 1,
-        "maxBackups": 10
+        "logToStdout": true
     },
     "servers": [
         {

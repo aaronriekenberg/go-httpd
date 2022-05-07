@@ -3,6 +3,7 @@ package requestlogging
 import (
 	"io"
 	"net/http"
+	"os"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -11,7 +12,7 @@ import (
 )
 
 type RequestLogger struct {
-	writer io.WriteCloser
+	writer io.Writer
 }
 
 func (RequestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
@@ -26,11 +27,19 @@ func CreateRequestLogger(
 		return nil
 	}
 
-	return &RequestLogger{
-		writer: &lumberjack.Logger{
+	var writer io.Writer
+
+	if requestLoggerConfig.LogToStdout {
+		writer = os.Stdout
+	} else {
+		writer = &lumberjack.Logger{
 			Filename:   requestLoggerConfig.RequestLogFile,
 			MaxSize:    requestLoggerConfig.MaxSizeMegabytes,
 			MaxBackups: requestLoggerConfig.MaxBackups,
-		},
+		}
+	}
+
+	return &RequestLogger{
+		writer: writer,
 	}
 }
