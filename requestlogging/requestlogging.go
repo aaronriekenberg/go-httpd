@@ -15,8 +15,8 @@ type RequestLogger struct {
 	writer io.Writer
 }
 
-func (RequestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
-	return gorillaHandlers.CombinedLoggingHandler(RequestLogger.writer, handler)
+func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
+	return gorillaHandlers.CombinedLoggingHandler(requestLogger.writer, handler)
 }
 
 func CreateRequestLogger(
