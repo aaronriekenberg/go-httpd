@@ -1,5 +1,4 @@
 go-httpd
 *.key
 *.pem
-logs/output*
-logs/lock*
+*.log
