@@ -1,15 +1,13 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 
 	"github.com/kr/pretty"
 
+	"github.com/aaronriekenberg/go-httpd/commandline"
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/dropprivileges"
 	"github.com/aaronriekenberg/go-httpd/logging"
@@ -17,67 +15,18 @@ import (
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
 
-var gitCommit string
-
 var logger = logging.GetLogger()
-
-func getAppName() string {
-	return fmt.Sprintf(
-		"%v (go version = %q gitCommit = %q)",
-		os.Args[0],
-		runtime.Version(),
-		gitCommit,
-	)
-}
-
-type commandLineFlags struct {
-	configFilePath string
-	verbose        bool
-}
-
-func processCommandLineFlags() commandLineFlags {
-	commandLineFlags := commandLineFlags{}
-
-	flag.StringVar(
-		&commandLineFlags.configFilePath,
-		"f",
-		"/etc/gohttpd.json",
-		"config file path",
-	)
-
-	flag.BoolVar(
-		&commandLineFlags.verbose,
-		"v",
-		false,
-		"enable verbose logging",
-	)
-
-	flag.Usage = func() {
-
-		fmt.Fprintf(
-			flag.CommandLine.Output(),
-			"Usage of %v:\n",
-			getAppName(),
-		)
-
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	return commandLineFlags
-}
 
 func main() {
 
-	commandLineFlags := processCommandLineFlags()
+	commandLineFlags := commandline.ProcessCommandLineFlags()
 
-	logger.SetVerboseEnabled(commandLineFlags.verbose)
+	logger.SetVerboseEnabled(commandLineFlags.Verbose)
 
-	logger.Printf("starting %v", getAppName())
+	logger.Printf("starting %v", commandline.AppName())
 	logger.Printf("commandLineFlags = %+v", commandLineFlags)
 
-	configuration := config.ReadConfiguration(commandLineFlags.configFilePath)
+	configuration := config.ReadConfiguration(commandLineFlags.ConfigFilePath)
 	logger.Printf("configuration:\n%# v", pretty.Formatter(configuration))
 
 	servers.CreateServers(configuration.Servers)
