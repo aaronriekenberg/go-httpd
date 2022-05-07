@@ -9,15 +9,6 @@ import (
 
 var logger = logging.GetLogger()
 
-func setCacheControlHeader(
-	w http.ResponseWriter,
-	cacheControlValue string,
-) {
-	if len(cacheControlValue) > 0 {
-		w.Header().Set("cache-control", cacheControlValue)
-	}
-}
-
 func CreateLocationsHandler(
 	locations []config.Location,
 ) http.Handler {
