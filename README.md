@@ -37,7 +37,8 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
     * Calls `setuid` at startup with uid for `userName`
   * `requestLogger`
     * May be omitted to disable request logging
-    * Write request logs to `requestLogFile` (relative to `chrootDirectory`)
+    * If `logToStdout` is true, write request logs to stdout.  Useful for debugging.
+    * Else write request logs to `requestLogFile` (relative to `chrootDirectory`)
   * `servers` list of server configurations
     * `serverID` string server id used for logging only
     * `networkAndListenAddressList` list of addresses and ports to listen on.
