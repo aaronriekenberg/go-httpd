@@ -21,6 +21,49 @@ type serverInfo struct {
 
 var networkAndListenAddressToServerInfo = map[config.NetworkAndListenAddress]*serverInfo{}
 
+func createServer(
+	serverConfig config.Server,
+	networkAndListenAddress config.NetworkAndListenAddress,
+) {
+	if _, exists := networkAndListenAddressToServerInfo[networkAndListenAddress]; exists {
+		logger.Fatalf("duplicate networkAndListenAddress %+v", networkAndListenAddress)
+	}
+
+	serverInfo := &serverInfo{
+		serverID: serverConfig.ServerID,
+		httpServer: &http.Server{
+			Addr: networkAndListenAddress.ListenAddress,
+		},
+	}
+
+	serverConfig.Timeouts.ApplyToHTTPServer(serverInfo.httpServer)
+
+	tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
+	if err != nil {
+		logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
+	}
+	serverInfo.netListener = tcpListener
+
+	if serverConfig.TLSInfo != nil {
+		cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
+		if err != nil {
+			logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
+		}
+
+		tlsConfig := &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			NextProtos:   []string{"h2", "http/1.1"},
+		}
+
+		tlsListener := tls.NewListener(tcpListener, tlsConfig)
+
+		serverInfo.netListener = tlsListener
+		serverInfo.httpServer.TLSConfig = tlsConfig
+	}
+
+	networkAndListenAddressToServerInfo[networkAndListenAddress] = serverInfo
+}
+
 func CreateServers(
 	servers []config.Server,
 ) {
@@ -28,45 +71,7 @@ func CreateServers(
 
 	for _, serverConfig := range servers {
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
-
-			if _, exists := networkAndListenAddressToServerInfo[networkAndListenAddress]; exists {
-				logger.Fatalf("duplicate networkAndListenAddress %+v", networkAndListenAddress)
-			}
-
-			serverInfo := &serverInfo{
-				serverID: serverConfig.ServerID,
-				httpServer: &http.Server{
-					Addr: networkAndListenAddress.ListenAddress,
-				},
-			}
-
-			serverConfig.Timeouts.ApplyToHTTPServer(serverInfo.httpServer)
-
-			tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
-			if err != nil {
-				logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
-			}
-			serverInfo.netListener = tcpListener
-
-			if serverConfig.TLSInfo != nil {
-				cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
-				if err != nil {
-					logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
-				}
-
-				tlsConfig := &tls.Config{
-					Certificates: []tls.Certificate{cert},
-					NextProtos:   []string{"h2", "http/1.1"},
-				}
-
-				tlsListener := tls.NewListener(tcpListener, tlsConfig)
-
-				serverInfo.netListener = tlsListener
-				serverInfo.httpServer.TLSConfig = tlsConfig
-			}
-
-			networkAndListenAddressToServerInfo[networkAndListenAddress] = serverInfo
-
+			createServer(serverConfig, networkAndListenAddress)
 		}
 	}
 
