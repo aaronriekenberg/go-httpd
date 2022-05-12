@@ -13,7 +13,7 @@ func CreateLocationsHandler(
 	locations []config.Location,
 ) http.Handler {
 
-	handler := &locationListHandler{}
+	var handler locationListHandler
 
 	for _, locationConfig := range locations {
 
@@ -24,5 +24,5 @@ func CreateLocationsHandler(
 
 	}
 
-	return handler
+	return &handler
 }
