@@ -13,36 +13,29 @@ import (
 
 var logger = logging.GetLogger()
 
-type serverInfo struct {
-	serverID    string
-	netListener net.Listener
-	httpServer  *http.Server
-}
+type serverRunFunc func(handler http.Handler)
 
-var networkAndListenAddressToServerInfo = map[config.NetworkAndListenAddress]*serverInfo{}
+var networkAndListenAddressToServerRunFunc = map[config.NetworkAndListenAddress]serverRunFunc{}
 
 func createServer(
 	serverConfig config.Server,
 	networkAndListenAddress config.NetworkAndListenAddress,
 ) {
-	if _, exists := networkAndListenAddressToServerInfo[networkAndListenAddress]; exists {
+
+	if _, exists := networkAndListenAddressToServerRunFunc[networkAndListenAddress]; exists {
 		logger.Fatalf("duplicate networkAndListenAddress %+v", networkAndListenAddress)
 	}
 
-	tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
+	netListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
 	if err != nil {
 		logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
 	}
 
-	serverInfo := &serverInfo{
-		serverID:    serverConfig.ServerID,
-		netListener: tcpListener,
-		httpServer: &http.Server{
-			Addr: networkAndListenAddress.ListenAddress,
-		},
+	httpServer := &http.Server{
+		Addr: networkAndListenAddress.ListenAddress,
 	}
 
-	serverConfig.Timeouts.ApplyToHTTPServer(serverInfo.httpServer)
+	serverConfig.Timeouts.ApplyToHTTPServer(httpServer)
 
 	if serverConfig.TLSInfo != nil {
 		cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
@@ -50,12 +43,30 @@ func createServer(
 			logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
 		}
 
-		serverInfo.httpServer.TLSConfig = &tls.Config{
+		httpServer.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
 	}
 
-	networkAndListenAddressToServerInfo[networkAndListenAddress] = serverInfo
+	networkAndListenAddressToServerRunFunc[networkAndListenAddress] = func(handler http.Handler) {
+
+		httpServer.Handler = handler
+
+		if httpServer.TLSConfig != nil {
+
+			logger.Printf("before ServeTLS serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
+			err := httpServer.ServeTLS(netListener, "", "")
+			logger.Fatalf("server.ServeTLS err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
+
+		} else {
+
+			logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
+			err := httpServer.Serve(netListener)
+			logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
+
+		}
+	}
+
 }
 
 func CreateServers(
@@ -103,26 +114,10 @@ func runServer(
 	handler http.Handler,
 ) {
 
-	serverInfo, ok := networkAndListenAddressToServerInfo[networkAndListenAddress]
+	runFunc, ok := networkAndListenAddressToServerRunFunc[networkAndListenAddress]
 	if !ok {
-		logger.Fatalf("unable to find serverInfo networkAndListenAddress = %+v", networkAndListenAddress)
+		logger.Fatalf("unable to find runFunc networkAndListenAddress = %+v", networkAndListenAddress)
 	}
 
-	httpServer := serverInfo.httpServer
-	httpServer.Handler = handler
-
-	if httpServer.TLSConfig != nil {
-
-		logger.Printf("before ServeTLS serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
-		err := httpServer.ServeTLS(serverInfo.netListener, "", "")
-		logger.Fatalf("server.ServeTLS err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
-
-	} else {
-
-		logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
-		err := httpServer.Serve(serverInfo.netListener)
-		logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
-
-	}
-
+	runFunc(handler)
 }
