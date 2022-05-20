@@ -37,7 +37,9 @@ func createServer(
 
 	serverConfig.Timeouts.ApplyToHTTPServer(httpServer)
 
-	if serverConfig.TLSInfo != nil {
+	usingTLS := serverConfig.TLSInfo != nil
+
+	if usingTLS {
 		cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
 		if err != nil {
 			logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
@@ -52,7 +54,7 @@ func createServer(
 
 		httpServer.Handler = handler
 
-		if httpServer.TLSConfig != nil {
+		if usingTLS {
 
 			logger.Printf("before ServeTLS serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
 			err := httpServer.ServeTLS(netListener, "", "")
