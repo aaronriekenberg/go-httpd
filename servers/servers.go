@@ -56,15 +56,15 @@ func createServer(
 
 		if usingTLS {
 
-			logger.Printf("before ServeTLS serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
+			logger.Printf("before httpServer.ServeTLS serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
 			err := httpServer.ServeTLS(netListener, "", "")
-			logger.Fatalf("server.ServeTLS err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
+			logger.Fatalf("httpServer.ServeTLS err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
 
 		} else {
 
-			logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
+			logger.Printf("before httpServer.Serve serverID = %q networkAndListenAddress = %+v", serverConfig.ServerID, networkAndListenAddress)
 			err := httpServer.Serve(netListener)
-			logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
+			logger.Fatalf("httpServer.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverConfig.ServerID, networkAndListenAddress)
 
 		}
 	}
