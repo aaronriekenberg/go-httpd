@@ -10,7 +10,7 @@ func setCacheControlHeader(
 	w http.ResponseWriter,
 	cacheControlValue string,
 ) {
-	const cacheControlKey = "cache-control"
+	const cacheControlKey = "Cache-Control"
 
 	if len(cacheControlValue) > 0 {
 		w.Header().Set(cacheControlKey, cacheControlValue)

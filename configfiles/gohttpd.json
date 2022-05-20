@@ -27,20 +27,21 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
+            "customResponseHeaders": {
+                "Cache-Control": "no-cache"
+            },
             "locations": [
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "/acme",
-                        "cacheControlValue": "no-cache"
+                        "directoryPath": "/acme"
                     }
                 },
                 {
                     "redirectLocation": {
                         "redirectURL": "https://$HTTP_HOST$REQUEST_PATH",
-                        "responseStatus": 302,
-                        "cacheControlValue": "no-cache"
+                        "responseStatus": 302
                     }
                 }
             ]
@@ -66,29 +67,27 @@
                 "writeTimeoutMilliseconds": 30000
             },
             "customResponseHeaders": {
-                "strict-transport-security": "max-age=63072000; includeSubDomains; preload"
+                "Cache-Control": "no-cache",
+                "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload"
             },
             "locations": [
                 {
                     "httpPathPrefix": "/.git",
                     "blockedLocation": {
-                        "responseStatus": 403,
-                        "cacheControlValue": "no-cache"
+                        "responseStatus": 403
                     }
                 },
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "/acme",
-                        "cacheControlValue": "no-cache"
+                        "directoryPath": "/acme"
                     }
                 },
                 {
                     "httpPathPrefix": "/cgi-bin/",
                     "fastCGILocation": {
-                        "unixSocketPath": "/run/go-fastcgi/socket",
-                        "cacheControlValue": "no-cache"
+                        "unixSocketPath": "/run/go-fastcgi/socket"
                     }
                 },
                 {
