@@ -94,7 +94,10 @@ func StartServers(
 	for _, serverConfig := range servers {
 		logger.Printf("StartServers serverID %q", serverConfig.ServerID)
 
-		handler := handlers.CreateLocationsHandler(serverConfig.Locations)
+		handler := handlers.CreateLocationsHandler(
+			serverConfig.Locations,
+			serverConfig.CustomResponseHeaders,
+		)
 
 		if requestLogger != nil {
 			handler = requestLogger.WrapHttpHandler(handler)

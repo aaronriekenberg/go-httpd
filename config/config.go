@@ -11,6 +11,20 @@ import (
 
 var logger = logging.GetLogger()
 
+type CustomResponseHeaders map[string]string
+
+func (customResponseHeaders *CustomResponseHeaders) ApplyToResponse(
+	w http.ResponseWriter,
+) {
+	if customResponseHeaders == nil {
+		return
+	}
+
+	for key, value := range *customResponseHeaders {
+		w.Header().Set(key, value)
+	}
+}
+
 type BlockedLocation struct {
 	ResponseStatus    int    `json:"responseStatus"`
 	CacheControlValue string `json:"cacheControlValue"`
@@ -93,6 +107,7 @@ type Server struct {
 	NetworkAndListenAddressList []NetworkAndListenAddress `json:"networkAndListenAddressList"`
 	TLSInfo                     *TLSInfo                  `json:"tlsInfo"`
 	Timeouts                    *Timeouts                 `json:"timeouts"`
+	CustomResponseHeaders       *CustomResponseHeaders    `json:"customResponseHeaders"`
 	Locations                   []Location                `json:"locations"`
 }
 

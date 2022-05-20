@@ -11,6 +11,7 @@ var logger = logging.GetLogger()
 
 func CreateLocationsHandler(
 	locations []config.Location,
+	customResponseHeaders *config.CustomResponseHeaders,
 ) http.Handler {
 
 	var handler locationListHandler
@@ -23,6 +24,8 @@ func CreateLocationsHandler(
 		)
 
 	}
+
+	handler.customResponseHeaders = customResponseHeaders
 
 	return &handler
 }

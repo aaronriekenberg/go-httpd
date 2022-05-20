@@ -65,6 +65,9 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
+            "customResponseHeaders": {
+                "strict-transport-security": "max-age=63072000; includeSubDomains; preload"
+            },
             "locations": [
                 {
                     "httpPathPrefix": "/.git",

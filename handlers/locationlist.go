@@ -1,9 +1,14 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/aaronriekenberg/go-httpd/config"
+)
 
 type locationListHandler struct {
-	locationHandlers []*locationHandler
+	locationHandlers      []*locationHandler
+	customResponseHeaders *config.CustomResponseHeaders
 }
 
 func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -17,6 +22,8 @@ func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter,
 			break
 		}
 	}
+
+	locationListHandler.customResponseHeaders.ApplyToResponse(w)
 
 	if matchingLocationHandler == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
