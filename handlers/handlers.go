@@ -14,19 +14,14 @@ func CreateServerLocationsHandler(
 	customResponseHeaders *config.CustomResponseHeaders,
 ) http.Handler {
 
-	handler := &locationListHandler{
-		locationHandlers:      make([]*locationHandler, 0, len(locations)),
-		customResponseHeaders: customResponseHeaders,
-	}
+	var handler http.Handler = newLocationListHandler(
+		locations,
+	)
 
-	for _, locationConfig := range locations {
-
-		handler.locationHandlers = append(
-			handler.locationHandlers,
-			newLocationHandler(locationConfig),
-		)
-
-	}
+	handler = createCustomResponseHeadersHandler(
+		customResponseHeaders,
+		handler,
+	)
 
 	return handler
 }

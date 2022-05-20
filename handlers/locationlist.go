@@ -7,8 +7,27 @@ import (
 )
 
 type locationListHandler struct {
-	locationHandlers      []*locationHandler
-	customResponseHeaders *config.CustomResponseHeaders
+	locationHandlers []*locationHandler
+}
+
+func newLocationListHandler(
+	locations []config.Location,
+) *locationListHandler {
+
+	handler := &locationListHandler{
+		locationHandlers: make([]*locationHandler, 0, len(locations)),
+	}
+
+	for _, locationConfig := range locations {
+
+		handler.locationHandlers = append(
+			handler.locationHandlers,
+			newLocationHandler(locationConfig),
+		)
+
+	}
+
+	return handler
 }
 
 func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -22,8 +41,6 @@ func (locationListHandler *locationListHandler) ServeHTTP(w http.ResponseWriter,
 			break
 		}
 	}
-
-	locationListHandler.customResponseHeaders.ApplyToResponse(w)
 
 	if matchingLocationHandler == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
