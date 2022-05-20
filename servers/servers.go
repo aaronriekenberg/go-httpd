@@ -29,8 +29,14 @@ func createServer(
 		logger.Fatalf("duplicate networkAndListenAddress %+v", networkAndListenAddress)
 	}
 
+	tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
+	if err != nil {
+		logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
+	}
+
 	serverInfo := &serverInfo{
-		serverID: serverConfig.ServerID,
+		serverID:    serverConfig.ServerID,
+		netListener: tcpListener,
 		httpServer: &http.Server{
 			Addr: networkAndListenAddress.ListenAddress,
 		},
@@ -38,27 +44,15 @@ func createServer(
 
 	serverConfig.Timeouts.ApplyToHTTPServer(serverInfo.httpServer)
 
-	tcpListener, err := net.Listen(networkAndListenAddress.Network, networkAndListenAddress.ListenAddress)
-	if err != nil {
-		logger.Fatalf("net.Listen %+v: %v", networkAndListenAddress, err)
-	}
-	serverInfo.netListener = tcpListener
-
 	if serverConfig.TLSInfo != nil {
 		cert, err := tls.LoadX509KeyPair(serverConfig.TLSInfo.CertFile, serverConfig.TLSInfo.KeyFile)
 		if err != nil {
 			logger.Fatalf("Can't load certificates for server %v: %v", serverConfig.ServerID, err)
 		}
 
-		tlsConfig := &tls.Config{
+		serverInfo.httpServer.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
-			NextProtos:   []string{"h2", "http/1.1"},
 		}
-
-		tlsListener := tls.NewListener(tcpListener, tlsConfig)
-
-		serverInfo.netListener = tlsListener
-		serverInfo.httpServer.TLSConfig = tlsConfig
 	}
 
 	networkAndListenAddressToServerInfo[networkAndListenAddress] = serverInfo
@@ -117,10 +111,18 @@ func runServer(
 	httpServer := serverInfo.httpServer
 	httpServer.Handler = handler
 
-	logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
+	if httpServer.TLSConfig != nil {
 
-	err := httpServer.Serve(serverInfo.netListener)
+		logger.Printf("before ServeTLS serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
+		err := httpServer.ServeTLS(serverInfo.netListener, "", "")
+		logger.Fatalf("server.ServeTLS err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
 
-	logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
+	} else {
+
+		logger.Printf("before Serve serverID = %q networkAndListenAddress = %+v", serverInfo.serverID, networkAndListenAddress)
+		err := httpServer.Serve(serverInfo.netListener)
+		logger.Fatalf("server.Serve err = %v serverID = %q networkAndListenAddress = %+v", err, serverInfo.serverID, networkAndListenAddress)
+
+	}
 
 }
