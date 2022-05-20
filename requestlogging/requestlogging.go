@@ -16,6 +16,10 @@ type RequestLogger struct {
 }
 
 func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
+	if requestLogger == nil {
+		return handler
+	}
+
 	return gorillaHandlers.CombinedLoggingHandler(requestLogger.writer, handler)
 }
 

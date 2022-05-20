@@ -94,14 +94,12 @@ func StartServers(
 	for _, serverConfig := range servers {
 		logger.Printf("StartServers serverID %q", serverConfig.ServerID)
 
-		handler := handlers.CreateLocationsHandler(
+		handler := handlers.CreateServerLocationsHandler(
 			serverConfig.Locations,
 			serverConfig.CustomResponseHeaders,
 		)
 
-		if requestLogger != nil {
-			handler = requestLogger.WrapHttpHandler(handler)
-		}
+		handler = requestLogger.WrapHttpHandler(handler)
 
 		for _, networkAndListenAddress := range serverConfig.NetworkAndListenAddressList {
 			go runServer(

@@ -9,12 +9,15 @@ import (
 
 var logger = logging.GetLogger()
 
-func CreateLocationsHandler(
+func CreateServerLocationsHandler(
 	locations []config.Location,
 	customResponseHeaders *config.CustomResponseHeaders,
 ) http.Handler {
 
-	var handler locationListHandler
+	handler := &locationListHandler{
+		locationHandlers:      make([]*locationHandler, 0, len(locations)),
+		customResponseHeaders: customResponseHeaders,
+	}
 
 	for _, locationConfig := range locations {
 
@@ -25,7 +28,5 @@ func CreateLocationsHandler(
 
 	}
 
-	handler.customResponseHeaders = customResponseHeaders
-
-	return &handler
+	return handler
 }
