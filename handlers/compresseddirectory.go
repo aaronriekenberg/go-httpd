@@ -27,8 +27,6 @@ func createCompressedDirectoryLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			setCacheControlHeader(w, compressedDirectoryLocation.CacheControlValue)
-
 			// Unlike http.FileServer, gzipped.FileServer does not serve
 			// index.html for directory requests by default.
 			// See withIndexHTML example:

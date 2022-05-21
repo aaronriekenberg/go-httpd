@@ -96,7 +96,7 @@ func StartServers(
 
 		handler := handlers.CreateServerLocationsHandler(
 			serverConfig.Locations,
-			serverConfig.CustomResponseHeaders,
+			serverConfig.ResponseHeaders,
 		)
 
 		handler = requestLogger.WrapHttpHandler(handler)

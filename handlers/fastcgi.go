@@ -29,16 +29,8 @@ func createFastCGILocationHandler(
 		10*time.Second, // life span of a client before expire
 	)
 
-	fastcgiHandler := gofast.NewHandler(
+	return gofast.NewHandler(
 		sessionHandler,
 		connectionPool.CreateClient,
-	)
-
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			setCacheControlHeader(w, fastCGILocation.CacheControlValue)
-
-			fastcgiHandler.ServeHTTP(w, r)
-		},
 	)
 }

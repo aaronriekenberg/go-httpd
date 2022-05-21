@@ -27,7 +27,7 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
-            "customResponseHeaders": {
+            "responseHeaders": {
                 "Cache-Control": "no-cache"
             },
             "locations": [
@@ -66,7 +66,7 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
-            "customResponseHeaders": {
+            "responseHeaders": {
                 "Cache-Control": "no-cache",
                 "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload"
             },
@@ -92,8 +92,10 @@
                 },
                 {
                     "compressedDirectoryLocation": {
-                        "directoryPath": "/htdocs/aaronr.digital",
-                        "cacheControlValue": "public, max-age=150"
+                        "directoryPath": "/htdocs/aaronr.digital"
+                    },
+                    "responseHeaders": {
+                        "Cache-Control": "public, max-age=150"
                     }
                 }
             ]

@@ -15,8 +15,6 @@ func createBlockedLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			setCacheControlHeader(w, blockedLocation.CacheControlValue)
-
 			w.WriteHeader(blockedLocation.ResponseStatus)
 		},
 	)

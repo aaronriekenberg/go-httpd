@@ -62,5 +62,10 @@ func createHTTPHandlerForLocation(
 		logger.Fatalf("invalid location config: \n%# v", pretty.Formatter(locationConfig))
 	}
 
+	locationHandler = newResponseHeadersHandler(
+		locationConfig.ResponseHeaders,
+		locationHandler,
+	)
+
 	return locationHandler
 }

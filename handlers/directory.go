@@ -13,20 +13,12 @@ func createDirectoryLocationHandler(
 
 	logger.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
-	fileServer := http.StripPrefix(
+	return http.StripPrefix(
 		directoryLocation.StripPrefix,
 		http.FileServer(
 			http.Dir(
 				directoryLocation.DirectoryPath,
 			),
 		),
-	)
-
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			setCacheControlHeader(w, directoryLocation.CacheControlValue)
-
-			fileServer.ServeHTTP(w, r)
-		},
 	)
 }

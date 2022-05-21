@@ -16,7 +16,6 @@ func createRedirectLocationHandler(
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			setCacheControlHeader(w, redirectLocation.CacheControlValue)
 
 			redirectURL := redirectLocation.RedirectURL
 			redirectURL = strings.ReplaceAll(redirectURL, "$HTTP_HOST", r.Host)

@@ -11,34 +11,29 @@ import (
 
 var logger = logging.GetLogger()
 
-type CustomResponseHeaders map[string]string
+type ResponseHeaders map[string]string
 
 type BlockedLocation struct {
-	ResponseStatus    int    `json:"responseStatus"`
-	CacheControlValue string `json:"cacheControlValue"`
+	ResponseStatus int `json:"responseStatus"`
 }
 
 type DirectoryLocation struct {
-	StripPrefix       string `json:"stripPrefix"`
-	DirectoryPath     string `json:"directoryPath"`
-	CacheControlValue string `json:"cacheControlValue"`
+	StripPrefix   string `json:"stripPrefix"`
+	DirectoryPath string `json:"directoryPath"`
 }
 
 type CompressedDirectoryLocation struct {
-	StripPrefix       string `json:"stripPrefix"`
-	DirectoryPath     string `json:"directoryPath"`
-	CacheControlValue string `json:"cacheControlValue"`
+	StripPrefix   string `json:"stripPrefix"`
+	DirectoryPath string `json:"directoryPath"`
 }
 
 type RedirectLocation struct {
-	RedirectURL       string `json:"redirectURL"`
-	ResponseStatus    int    `json:"responseStatus"`
-	CacheControlValue string `json:"cacheControlValue"`
+	RedirectURL    string `json:"redirectURL"`
+	ResponseStatus int    `json:"responseStatus"`
 }
 
 type FastCGILocation struct {
-	UnixSocketPath    string `json:"unixSocketPath"`
-	CacheControlValue string `json:"cacheControlValue"`
+	UnixSocketPath string `json:"unixSocketPath"`
 }
 
 type Location struct {
@@ -48,6 +43,7 @@ type Location struct {
 	CompressedDirectoryLocation *CompressedDirectoryLocation `json:"compressedDirectoryLocation"`
 	RedirectLocation            *RedirectLocation            `json:"redirectLocation"`
 	FastCGILocation             *FastCGILocation             `json:"fastCGILocation"`
+	ResponseHeaders             *ResponseHeaders             `json:"responseHeaders"`
 }
 
 type TLSInfo struct {
@@ -95,7 +91,7 @@ type Server struct {
 	NetworkAndListenAddressList []NetworkAndListenAddress `json:"networkAndListenAddressList"`
 	TLSInfo                     *TLSInfo                  `json:"tlsInfo"`
 	Timeouts                    *Timeouts                 `json:"timeouts"`
-	CustomResponseHeaders       *CustomResponseHeaders    `json:"customResponseHeaders"`
+	ResponseHeaders             *ResponseHeaders          `json:"responseHeaders"`
 	Locations                   []Location                `json:"locations"`
 }
 

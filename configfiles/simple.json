@@ -15,19 +15,23 @@
                 "readTimeoutMilliseconds": 30000,
                 "writeTimeoutMilliseconds": 30000
             },
+            "responseHeaders": {
+                "Cache-Control": "no-cache"
+            },
             "locations": [
                 {
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
-                        "directoryPath": "/Users/aaron/acme",
-                        "cacheControlValue": "no-cache"
+                        "directoryPath": "/Users/aaron/acme"
                     }
                 },
                 {
                     "directoryLocation": {
-                        "directoryPath": ".",
-                        "cacheControlValue": "public, max-age=150"
+                        "directoryPath": "."
+                    },
+                    "responseHeaders": {
+                        "Cache-Control": "public, max-age=150"
                     }
                 }
             ]
