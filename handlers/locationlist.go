@@ -12,7 +12,7 @@ type locationListHandler struct {
 
 func newLocationListHandler(
 	locations []config.Location,
-) *locationListHandler {
+) http.Handler {
 
 	handler := &locationListHandler{
 		locationHandlers: make([]*locationHandler, 0, len(locations)),
