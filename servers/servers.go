@@ -94,7 +94,7 @@ func StartServers(
 	for _, serverConfig := range servers {
 		logger.Printf("StartServers serverID %q", serverConfig.ServerID)
 
-		handler := handlers.CreateServerLocationsHandler(
+		handler := handlers.NewServerLocationsHandler(
 			serverConfig.Locations,
 			serverConfig.ResponseHeaders,
 		)

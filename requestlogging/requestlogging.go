@@ -23,7 +23,7 @@ func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.H
 	return gorillaHandlers.CombinedLoggingHandler(requestLogger.writer, handler)
 }
 
-func CreateRequestLogger(
+func NewRequestLogger(
 	requestLoggerConfig *config.RequestLogger,
 ) *RequestLogger {
 

@@ -33,7 +33,7 @@ func main() {
 
 	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
-	requestLogger := requestlogging.CreateRequestLogger(configuration.RequestLogger)
+	requestLogger := requestlogging.NewRequestLogger(configuration.RequestLogger)
 
 	servers.StartServers(
 		configuration.Servers,

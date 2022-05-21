@@ -9,7 +9,7 @@ import (
 
 var logger = logging.GetLogger()
 
-func CreateServerLocationsHandler(
+func NewServerLocationsHandler(
 	locations []config.Location,
 	serverResponseHeaders *config.ResponseHeaders,
 ) http.Handler {
