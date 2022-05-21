@@ -43,25 +43,23 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
     * `serverID` string server id used for logging only
     * `networkAndListenAddressList` list of addresses and ports to listen on.
     * `timeouts` read and write timeouts for server sockets
+    * `responseHeaders` response header keys and values at server level.
     * `locations` list of location configurations.  Applied in configured order when each request is processed.
       * `httpPathPrefix` url path prefix for matching location
+      * `responseHeaders` response header keys and values at server-location level.  Can be used to override server level `responseHeaders`.
       * Each `location` contains one of the following location types:
       * `blockedLocation`
         * Always return the specified `responseStatus` with no body
-        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
       * `directoryLocation`
         * Use go's `http.FileServer` to serve files in the specified `directoryPath` 
         * `directoryPath` is relative to `chrootDirectory`
         * `stripPrefix` may be specified to strip url prefix elements before file serving
-        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
       * `compressedDirectoryLocation`
         * Use `github.com/lpar/gzipped/v2` to serve pre-compressed static files ending in `.gz` or `.br` based on `Accept-Encoding` request header
         * Similar to `gzip-static` option in OpenBSD httpd
         * Configuration fields are the same as `directoryLocation`
       * `fastCGILocation`
         * Use `github.com/yookoala/gofast` to connect to a fastcgi application using a unix socket at `unixSocketPath`
-        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
       * `redirectLocation`
         * Send a redirect response using the specified `redirectURL` and `responseStatus`
         * `redirectURL` may contain variables `$HTTP_HOST` and `$REQUEST_PATH`
-        * `cacheControlValue` may be specified to control the `Cache-Control` response header value
