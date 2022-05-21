@@ -33,7 +33,9 @@ type RedirectLocation struct {
 }
 
 type FastCGILocation struct {
-	UnixSocketPath string `json:"unixSocketPath"`
+	UnixSocketPath                     string `json:"unixSocketPath"`
+	ConnectionPoolSize                 *int   `json:"connectionPoolSize"`
+	ConnectionPoolLifetimeMilliseconds *int   `json:"connectionPoolLifetimeMilliseconds"`
 }
 
 type Location struct {

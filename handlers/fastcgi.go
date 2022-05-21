@@ -13,8 +13,6 @@ func newFastCGILocationHandler(
 	fastCGILocation config.FastCGILocation,
 ) http.Handler {
 
-	logger.Printf("newFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
-
 	sessionHandler := gofast.Chain(
 		gofast.BasicParamsMap, // maps common CGI parameters
 		gofast.MapHeader,      // maps header fields into HTTP_* parameters
@@ -22,11 +20,27 @@ func newFastCGILocationHandler(
 
 	connectionFactory := gofast.SimpleConnFactory("unix", fastCGILocation.UnixSocketPath)
 
-	// XXX make parameters configurable?
+	connectionPoolSize := uint(10)
+	if fastCGILocation.ConnectionPoolSize != nil {
+		connectionPoolSize = uint(*fastCGILocation.ConnectionPoolSize)
+	}
+
+	connectionPoolLifetimeDuration := 10 * time.Second
+	if fastCGILocation.ConnectionPoolLifetimeMilliseconds != nil {
+		connectionPoolLifetimeDuration = time.Duration(*fastCGILocation.ConnectionPoolLifetimeMilliseconds) * time.Millisecond
+	}
+
+	logger.Printf(
+		"newFastCGILocationHandler httpPathPrefix = %q connectionPoolSize = %v connectionPoolLifetimeDuration = %v",
+		httpPathPrefix,
+		connectionPoolSize,
+		connectionPoolLifetimeDuration,
+	)
+
 	connectionPool := gofast.NewClientPool(
 		gofast.SimpleClientFactory(connectionFactory),
-		10,             // buffer size for pre-created client-connection
-		10*time.Second, // life span of a client before expire
+		connectionPoolSize,             // buffer size for pre-created client-connection
+		connectionPoolLifetimeDuration, // life span of a client before expire
 	)
 
 	return gofast.NewHandler(
