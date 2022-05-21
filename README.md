@@ -60,6 +60,8 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
         * Configuration fields are the same as `directoryLocation`
       * `fastCGILocation`
         * Use `github.com/yookoala/gofast` to connect to a fastcgi application using a unix socket at `unixSocketPath`
+        * `connectionPoolSize` specify fastcgi connection pool size.  If not specified defaults to 10.
+        * `connectionPoolLifetimeMilliseconds` specify fastcgi connection pool entry lifetime.  If not specified defaults to 10 seconds.
       * `redirectLocation`
         * Send a redirect response using the specified `redirectURL` and `responseStatus`
         * `redirectURL` may contain variables `$HTTP_HOST` and `$REQUEST_PATH`
