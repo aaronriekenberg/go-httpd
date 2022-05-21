@@ -27,31 +27,31 @@ func createHTTPHandlerForLocation(
 
 	switch {
 	case locationConfig.BlockedLocation != nil:
-		locationHandler = createBlockedLocationHandler(
+		locationHandler = newBlockedLocationHandler(
 			locationConfig.HttpPathPrefix,
 			*locationConfig.BlockedLocation,
 		)
 
 	case locationConfig.DirectoryLocation != nil:
-		locationHandler = createDirectoryLocationHandler(
+		locationHandler = newDirectoryLocationHandler(
 			locationConfig.HttpPathPrefix,
 			*locationConfig.DirectoryLocation,
 		)
 
 	case locationConfig.CompressedDirectoryLocation != nil:
-		locationHandler = createCompressedDirectoryLocationHandler(
+		locationHandler = newCompressedDirectoryLocationHandler(
 			locationConfig.HttpPathPrefix,
 			*locationConfig.CompressedDirectoryLocation,
 		)
 
 	case locationConfig.RedirectLocation != nil:
-		locationHandler = createRedirectLocationHandler(
+		locationHandler = newRedirectLocationHandler(
 			locationConfig.HttpPathPrefix,
 			*locationConfig.RedirectLocation,
 		)
 
 	case locationConfig.FastCGILocation != nil:
-		locationHandler = createFastCGILocationHandler(
+		locationHandler = newFastCGILocationHandler(
 			locationConfig.HttpPathPrefix,
 			*locationConfig.FastCGILocation,
 		)

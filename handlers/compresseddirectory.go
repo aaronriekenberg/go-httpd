@@ -9,12 +9,12 @@ import (
 	"github.com/lpar/gzipped/v2"
 )
 
-func createCompressedDirectoryLocationHandler(
+func newCompressedDirectoryLocationHandler(
 	httpPathPrefix string,
 	compressedDirectoryLocation config.CompressedDirectoryLocation,
 ) http.Handler {
 
-	logger.Printf("createCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("newCompressedDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	fileServer := http.StripPrefix(
 		compressedDirectoryLocation.StripPrefix,

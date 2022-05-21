@@ -7,12 +7,12 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 )
 
-func createRedirectLocationHandler(
+func newRedirectLocationHandler(
 	httpPathPrefix string,
 	redirectLocation config.RedirectLocation,
 ) http.Handler {
 
-	logger.Printf("createRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("newRedirectLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {

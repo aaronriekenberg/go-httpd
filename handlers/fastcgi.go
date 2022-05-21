@@ -8,12 +8,12 @@ import (
 	"github.com/yookoala/gofast"
 )
 
-func createFastCGILocationHandler(
+func newFastCGILocationHandler(
 	httpPathPrefix string,
 	fastCGILocation config.FastCGILocation,
 ) http.Handler {
 
-	logger.Printf("createFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("newFastCGILocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	sessionHandler := gofast.Chain(
 		gofast.BasicParamsMap, // maps common CGI parameters

@@ -6,12 +6,12 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 )
 
-func createDirectoryLocationHandler(
+func newDirectoryLocationHandler(
 	httpPathPrefix string,
 	directoryLocation config.DirectoryLocation,
 ) http.Handler {
 
-	logger.Printf("createDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
+	logger.Printf("newDirectoryLocationHandler httpPathPrefix = %q", httpPathPrefix)
 
 	return http.StripPrefix(
 		directoryLocation.StripPrefix,
