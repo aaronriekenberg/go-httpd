@@ -23,6 +23,8 @@ func createHTTPHandlerForLocation(
 	locationConfig config.Location,
 ) http.Handler {
 
+	logger.Printf("creating handler for locationID %q", locationConfig.LocationID)
+
 	var locationHandler http.Handler
 
 	switch {

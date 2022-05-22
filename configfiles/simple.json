@@ -20,6 +20,7 @@
             },
             "locations": [
                 {
+                    "locationID": "acme challenge",
                     "httpPathPrefix": "/.well-known/acme-challenge/",
                     "directoryLocation": {
                         "stripPrefix": "/.well-known/acme-challenge/",
@@ -27,6 +28,7 @@
                     }
                 },
                 {
+                    "locationID": "default directory",
                     "directoryLocation": {
                         "directoryPath": "."
                     },

@@ -4,10 +4,7 @@ import (
 	"net/http"
 
 	"github.com/aaronriekenberg/go-httpd/config"
-	"github.com/aaronriekenberg/go-httpd/logging"
 )
-
-var logger = logging.GetLogger()
 
 func NewServerLocationsHandler(
 	locations []config.Location,

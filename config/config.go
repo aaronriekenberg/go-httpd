@@ -39,6 +39,7 @@ type FastCGILocation struct {
 }
 
 type Location struct {
+	LocationID                  string                       `json:"locationID"`
 	HttpPathPrefix              string                       `json:"httpPathPrefix"`
 	BlockedLocation             *BlockedLocation             `json:"blockedLocation"`
 	DirectoryLocation           *DirectoryLocation           `json:"directoryLocation"`
