@@ -46,7 +46,7 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
     * `responseHeaders` response header keys and values at server level.
     * `locations` list of location configurations.  Applied in configured order when each request is processed.
       * `locationID` string location id used for logging only
-      * `httpPathPrefix` url path prefix for matching location
+      * `httpPathPrefix` url path prefix for matching location.  If not specified defaults to `""` which matches any URL.
       * `responseHeaders` response header keys and values at server-location level.  Can be used to override server level `responseHeaders`.
       * Each `location` contains one of the following location types:
       * `blockedLocation`
