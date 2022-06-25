@@ -20,31 +20,38 @@ func newFastCGILocationHandler(
 
 	connectionFactory := gofast.SimpleConnFactory("unix", fastCGILocation.UnixSocketPath)
 
-	connectionPoolSize := uint(10)
-	if fastCGILocation.ConnectionPoolSize != nil {
-		connectionPoolSize = uint(*fastCGILocation.ConnectionPoolSize)
-	}
-
-	connectionPoolLifetimeDuration := 10 * time.Second
-	if fastCGILocation.ConnectionPoolLifetimeMilliseconds != nil {
-		connectionPoolLifetimeDuration = time.Duration(*fastCGILocation.ConnectionPoolLifetimeMilliseconds) * time.Millisecond
-	}
+	var clientFactory gofast.ClientFactory
 
 	logger.Printf(
-		"newFastCGILocationHandler httpPathPrefix = %q connectionPoolSize = %v connectionPoolLifetimeDuration = %v",
+		"newFastCGILocationHandler httpPathPrefix = %q connectionPool = %+v",
 		httpPathPrefix,
-		connectionPoolSize,
-		connectionPoolLifetimeDuration,
+		fastCGILocation.ConnectionPool,
 	)
 
-	connectionPool := gofast.NewClientPool(
-		gofast.SimpleClientFactory(connectionFactory),
-		connectionPoolSize,             // buffer size for pre-created client-connection
-		connectionPoolLifetimeDuration, // life span of a client before expire
-	)
+	if !fastCGILocation.ConnectionPool.Enabled {
+		clientFactory = gofast.SimpleClientFactory(connectionFactory)
+	} else {
+		connectionPoolSize := uint(10)
+		if fastCGILocation.ConnectionPool.Size != nil {
+			connectionPoolSize = uint(*fastCGILocation.ConnectionPool.Size)
+		}
+
+		connectionPoolLifetimeDuration := 10 * time.Second
+		if fastCGILocation.ConnectionPool.LifetimeMilliseconds != nil {
+			connectionPoolLifetimeDuration = time.Duration(*fastCGILocation.ConnectionPool.LifetimeMilliseconds) * time.Millisecond
+		}
+
+		connectionPool := gofast.NewClientPool(
+			gofast.SimpleClientFactory(connectionFactory),
+			connectionPoolSize,             // buffer size for pre-created client-connection
+			connectionPoolLifetimeDuration, // life span of a client before expire
+		)
+
+		clientFactory = connectionPool.CreateClient
+	}
 
 	return gofast.NewHandler(
 		sessionHandler,
-		connectionPool.CreateClient,
+		clientFactory,
 	)
 }
