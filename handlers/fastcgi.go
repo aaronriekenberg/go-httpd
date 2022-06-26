@@ -13,33 +13,27 @@ func newFastCGILocationHandler(
 	fastCGILocation config.FastCGILocation,
 ) http.Handler {
 
+	logger.Printf(
+		"newFastCGILocationHandler httpPathPrefix = %q fastCGILocation = %+v",
+		httpPathPrefix,
+		fastCGILocation,
+	)
+
 	sessionHandler := gofast.Chain(
 		gofast.BasicParamsMap, // maps common CGI parameters
 		gofast.MapHeader,      // maps header fields into HTTP_* parameters
 	)(gofast.BasicSession)
 
-	connectionFactory := gofast.SimpleConnFactory("unix", fastCGILocation.UnixSocketPath)
+	connectionFactory := gofast.SimpleConnFactory(fastCGILocation.Network, fastCGILocation.Address)
 
 	var clientFactory gofast.ClientFactory
 
-	logger.Printf(
-		"newFastCGILocationHandler httpPathPrefix = %q connectionPool = %+v",
-		httpPathPrefix,
-		fastCGILocation.ConnectionPool,
-	)
-
-	if !fastCGILocation.ConnectionPool.Enabled {
+	if fastCGILocation.ConnectionPool == nil {
 		clientFactory = gofast.SimpleClientFactory(connectionFactory)
 	} else {
-		connectionPoolSize := uint(10)
-		if fastCGILocation.ConnectionPool.Size != nil {
-			connectionPoolSize = uint(*fastCGILocation.ConnectionPool.Size)
-		}
+		connectionPoolSize := uint(fastCGILocation.ConnectionPool.Size)
 
-		connectionPoolLifetimeDuration := 10 * time.Second
-		if fastCGILocation.ConnectionPool.LifetimeMilliseconds != nil {
-			connectionPoolLifetimeDuration = time.Duration(*fastCGILocation.ConnectionPool.LifetimeMilliseconds) * time.Millisecond
-		}
+		connectionPoolLifetimeDuration := time.Duration(fastCGILocation.ConnectionPool.LifetimeMilliseconds) * time.Millisecond
 
 		connectionPool := gofast.NewClientPool(
 			gofast.SimpleClientFactory(connectionFactory),

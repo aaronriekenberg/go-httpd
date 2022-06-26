@@ -33,11 +33,11 @@ type RedirectLocation struct {
 }
 
 type FastCGILocation struct {
-	UnixSocketPath string `json:"unixSocketPath"`
-	ConnectionPool struct {
-		Enabled              bool `json:"enabled"`
-		Size                 *int `json:"size"`
-		LifetimeMilliseconds *int `json:"lifetimeMilliseconds"`
+	Network        string `json:"network"`
+	Address        string `json:"address"`
+	ConnectionPool *struct {
+		Size                 int `json:"size"`
+		LifetimeMilliseconds int `json:"lifetimeMilliseconds"`
 	} `json:"connectionPool"`
 }
 

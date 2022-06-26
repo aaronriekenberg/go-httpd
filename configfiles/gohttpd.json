@@ -92,7 +92,8 @@
                     "locationID": "cgi-bin",
                     "httpPathPrefix": "/cgi-bin/",
                     "fastCGILocation": {
-                        "unixSocketPath": "/run/go-fastcgi/socket"
+                        "network": "unix",
+                        "address": "/run/go-fastcgi/socket"
                     }
                 },
                 {
