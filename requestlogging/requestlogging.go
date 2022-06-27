@@ -32,19 +32,6 @@ func (requestLogger *RequestLogger) run(
 	}
 }
 
-func newRequestLogger(
-	writer io.Writer,
-) *RequestLogger {
-
-	requestLogger := &RequestLogger{
-		writeChannel: make(chan []byte, writeChannelCapacity),
-	}
-
-	go requestLogger.run(writer)
-
-	return requestLogger
-}
-
 func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
 	if requestLogger == nil {
 		return handler
@@ -73,7 +60,11 @@ func NewRequestLogger(
 		}
 	}
 
-	return newRequestLogger(
-		writer,
-	)
+	requestLogger := &RequestLogger{
+		writeChannel: make(chan []byte, writeChannelCapacity),
+	}
+
+	go requestLogger.run(writer)
+
+	return requestLogger
 }
