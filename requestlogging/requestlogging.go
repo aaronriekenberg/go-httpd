@@ -14,7 +14,6 @@ import (
 const writeChannelCapacity = 100
 
 type RequestLogger struct {
-	writer       io.Writer
 	writeChannel chan []byte
 }
 
@@ -24,10 +23,12 @@ func (requestLogger *RequestLogger) Write(p []byte) (n int, err error) {
 	return bufferLength, nil
 }
 
-func (requestLogger *RequestLogger) run() {
+func (requestLogger *RequestLogger) run(
+	writer io.Writer,
+) {
 	for {
 		buffer := <-requestLogger.writeChannel
-		requestLogger.writer.Write(buffer)
+		writer.Write(buffer)
 	}
 }
 
@@ -36,11 +37,10 @@ func newRequestLogger(
 ) *RequestLogger {
 
 	requestLogger := &RequestLogger{
-		writer:       writer,
 		writeChannel: make(chan []byte, writeChannelCapacity),
 	}
 
-	go requestLogger.run()
+	go requestLogger.run(writer)
 
 	return requestLogger
 }
