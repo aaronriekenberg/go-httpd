@@ -11,8 +11,38 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 )
 
+const writeChannelCapacity = 100
+
 type RequestLogger struct {
-	writer io.Writer
+	writer       io.Writer
+	writeChannel chan []byte
+}
+
+func (requestLogger *RequestLogger) Write(p []byte) (n int, err error) {
+	bufferLength := len(p)
+	requestLogger.writeChannel <- p
+	return bufferLength, nil
+}
+
+func (requestLogger *RequestLogger) run() {
+	for {
+		buffer := <-requestLogger.writeChannel
+		requestLogger.writer.Write(buffer)
+	}
+}
+
+func newRequestLogger(
+	writer io.Writer,
+) *RequestLogger {
+
+	requestLogger := &RequestLogger{
+		writer:       writer,
+		writeChannel: make(chan []byte, writeChannelCapacity),
+	}
+
+	go requestLogger.run()
+
+	return requestLogger
 }
 
 func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
@@ -20,7 +50,7 @@ func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.H
 		return handler
 	}
 
-	return gorillaHandlers.CombinedLoggingHandler(requestLogger.writer, handler)
+	return gorillaHandlers.CombinedLoggingHandler(requestLogger, handler)
 }
 
 func NewRequestLogger(
@@ -43,7 +73,7 @@ func NewRequestLogger(
 		}
 	}
 
-	return &RequestLogger{
-		writer: writer,
-	}
+	return newRequestLogger(
+		writer,
+	)
 }
