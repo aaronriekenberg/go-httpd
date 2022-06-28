@@ -7,14 +7,14 @@ import (
 	"runtime"
 )
 
-var gitCommit string
+var version string
 
 func AppName() string {
 	return fmt.Sprintf(
-		"%v (go version = %q gitCommit = %q)",
+		"%v (version = %q go version = %q)",
 		os.Args[0],
+		version,
 		runtime.Version(),
-		gitCommit,
 	)
 }
 
