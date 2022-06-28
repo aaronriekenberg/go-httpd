@@ -23,7 +23,7 @@ func (requestLogger *RequestLogger) Write(p []byte) (n int, err error) {
 	return bufferLength, nil
 }
 
-func (requestLogger *RequestLogger) run(
+func (requestLogger *RequestLogger) runWriter(
 	writer io.Writer,
 ) {
 	for {
@@ -64,7 +64,7 @@ func NewRequestLogger(
 		writeChannel: make(chan []byte, writeChannelCapacity),
 	}
 
-	go requestLogger.run(writer)
+	go requestLogger.runWriter(writer)
 
 	return requestLogger
 }
