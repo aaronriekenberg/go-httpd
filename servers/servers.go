@@ -87,7 +87,7 @@ func CreateServers(
 
 func StartServers(
 	servers []config.Server,
-	requestLogger *requestlogging.RequestLogger,
+	requestLogger requestlogging.RequestLogger,
 ) {
 	logger.Printf("begin StartServers")
 

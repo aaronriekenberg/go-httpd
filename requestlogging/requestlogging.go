@@ -13,17 +13,21 @@ import (
 
 const writeChannelCapacity = 100
 
-type RequestLogger struct {
+type RequestLogger interface {
+	WrapHttpHandler(handler http.Handler) http.Handler
+}
+
+type requestLogger struct {
 	writeChannel chan []byte
 }
 
-func (requestLogger *RequestLogger) Write(p []byte) (n int, err error) {
+func (requestLogger *requestLogger) Write(p []byte) (n int, err error) {
 	bufferLength := len(p)
 	requestLogger.writeChannel <- p
 	return bufferLength, nil
 }
 
-func (requestLogger *RequestLogger) runWriter(
+func (requestLogger *requestLogger) runAsyncWriter(
 	writer io.Writer,
 ) {
 	for {
@@ -32,7 +36,7 @@ func (requestLogger *RequestLogger) runWriter(
 	}
 }
 
-func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
+func (requestLogger *requestLogger) WrapHttpHandler(handler http.Handler) http.Handler {
 	if requestLogger == nil {
 		return handler
 	}
@@ -42,10 +46,10 @@ func (requestLogger *RequestLogger) WrapHttpHandler(handler http.Handler) http.H
 
 func NewRequestLogger(
 	requestLoggerConfig *config.RequestLogger,
-) *RequestLogger {
+) RequestLogger {
 
 	if requestLoggerConfig == nil {
-		return nil
+		return (*requestLogger)(nil)
 	}
 
 	var writer io.Writer
@@ -60,11 +64,11 @@ func NewRequestLogger(
 		}
 	}
 
-	requestLogger := &RequestLogger{
+	requestLogger := &requestLogger{
 		writeChannel: make(chan []byte, writeChannelCapacity),
 	}
 
-	go requestLogger.runWriter(writer)
+	go requestLogger.runAsyncWriter(writer)
 
 	return requestLogger
 }
