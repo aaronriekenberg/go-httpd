@@ -24,7 +24,7 @@ type CommandLineFlags struct {
 }
 
 func ProcessCommandLineFlags() CommandLineFlags {
-	commandLineFlags := CommandLineFlags{}
+	var commandLineFlags CommandLineFlags
 
 	flag.StringVar(
 		&commandLineFlags.ConfigFilePath,
