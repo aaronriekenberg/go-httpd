@@ -28,7 +28,7 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
   3. Create and bind server sockets (`net.Listener`) as root, allowing use of privileged ports 80 and 443.
   4. Call `chroot` to change root to `/var/www` or other configured directory
   5. Call `setuid` and `setgid` to change to unpriviged `www` user/group or other configured user/group
-  6. Call `pledge` to limit system calls to `stdio rpath wpath inet unix`.  
+  6. Call `pledge` to limit system calls to `stdio rpath wpath cpath inet unix`.  
   7. Create request logger if configured.
   8. Create request handlers and start the HTTP servers.
 * A noop wrapper for pledge is provided so the app builds and runs on non-OpenBSD OS.
