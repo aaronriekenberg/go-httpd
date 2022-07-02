@@ -24,8 +24,6 @@ func main() {
 
 	logger.SetVerboseEnabled(commandLineFlags.Verbose)
 
-	pledge.InitialPledge()
-
 	logger.Printf("starting %v", commandline.AppName())
 	logger.Printf("commandLineFlags = %+v", commandLineFlags)
 
@@ -36,14 +34,14 @@ func main() {
 
 	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
+	pledge.FinalPledge()
+
 	requestLogger := requestlogging.NewRequestLogger(configuration.RequestLogger)
 
 	servers.StartServers(
 		configuration.Servers,
 		requestLogger,
 	)
-
-	pledge.FinalPledge()
 
 	awaitShutdownSignal()
 }
