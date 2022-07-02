@@ -11,6 +11,7 @@ import (
 	"github.com/aaronriekenberg/go-httpd/config"
 	"github.com/aaronriekenberg/go-httpd/dropprivileges"
 	"github.com/aaronriekenberg/go-httpd/logging"
+	"github.com/aaronriekenberg/go-httpd/pledge"
 	"github.com/aaronriekenberg/go-httpd/requestlogging"
 	"github.com/aaronriekenberg/go-httpd/servers"
 )
@@ -18,6 +19,8 @@ import (
 var logger = logging.GetLogger()
 
 func main() {
+
+	pledge.InitialPledge()
 
 	commandLineFlags := commandline.ProcessCommandLineFlags()
 

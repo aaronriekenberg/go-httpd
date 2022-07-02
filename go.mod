@@ -7,6 +7,7 @@ require (
 	github.com/kr/pretty v0.3.0
 	github.com/lpar/gzipped/v2 v2.0.2
 	github.com/yookoala/gofast v0.6.0
+	golang.org/x/sys v0.0.0-20220702020025-31831981b65f
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
