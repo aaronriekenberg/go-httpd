@@ -20,11 +20,11 @@ var logger = logging.GetLogger()
 
 func main() {
 
-	pledge.InitialPledge()
-
 	commandLineFlags := commandline.ProcessCommandLineFlags()
 
 	logger.SetVerboseEnabled(commandLineFlags.Verbose)
+
+	pledge.InitialPledge()
 
 	logger.Printf("starting %v", commandline.AppName())
 	logger.Printf("commandLineFlags = %+v", commandLineFlags)
@@ -42,6 +42,8 @@ func main() {
 		configuration.Servers,
 		requestLogger,
 	)
+
+	pledge.FinalPledge()
 
 	awaitShutdownSignal()
 }
