@@ -2,6 +2,37 @@
 
 A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd.org/httpd).
 
+## Features
+
+* Simple configuration using JSON
+  * See `configfiles` directory for example working configurations.
+* Uses go's built-in `net/http` server
+  * Supports HTTP/1.1 and HTTP/2.0
+  * Multiple servers can be configured with optional TLS.  
+  * Easy to use with acme-client, see `configfiles/gohttpd.json` example.
+  * Automatic thread creation by go, each request is run in its own goroutine.
+* Optional request logging
+  * Uses `CombinedLoggingHandler` from `github.com/gorilla/handlers`
+  * Uses `gopkg.in/natefinch/lumberjack.v2` to write rotate reuqest log files when they reach a configured size.
+  * File I/O for request logging is asynchronous using a go channel.
+* Each HTTP server has a configured list of locations that are applied exactly in configured order for each request.
+* Configurable response header values at server and server-location levels.
+* Blocked locations and HTTP redirect locations.
+* Static file and directory servers using standard go `http.FileServer`.
+* Pre-compressed file serving using `github.com/lpar/gzipped/v2`
+  * Supports brotli and gzip files based on `Accept-Encoding` request header
+* Supports FastCGI with unix sockets using `github.com/yookoala/gofast`
+* Drops privileges at startup and uses `pledge()`.  Roughly the following happens at startup:
+  1. go-httpd daemon is started as root
+  2. Read configuration file and TLS certificates as root
+  3. Create and bind server sockets (`net.Listener`) as root, allowing use of privileged ports 80 and 443.
+  4. Call `chroot` to change root to `/var/www` or other configured directory
+  5. Call `setuid` and `setgid` to change to unpriviged `www` user/group or other configured user/group
+  6. Call `pledge` to limit system calls to `stdio rpath wpath inet unix`.  
+  7. Create request logger if configured.
+  8. Create request handlers and start the HTTP servers.
+* A noop wrapper for pledge is provided so the app builds and runs on non-OpenBSD OS.
+
 ## Usage on OpenBSD
 
 * Install go if needed with `pkg_add go`
