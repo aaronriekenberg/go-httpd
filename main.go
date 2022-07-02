@@ -34,7 +34,7 @@ func main() {
 
 	dropprivileges.DropPrivileges(configuration.DropPrivileges)
 
-	pledge.FinalPledge()
+	pledge.Pledge()
 
 	requestLogger := requestlogging.NewRequestLogger(configuration.RequestLogger)
 

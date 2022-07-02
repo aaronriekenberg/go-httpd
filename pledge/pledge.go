@@ -6,11 +6,11 @@ import (
 
 var logger = logging.GetLogger()
 
-func FinalPledge() {
+func Pledge() {
 	const promises = "stdio rpath wpath inet unix"
 
 	if err := pledgeWrapper(promises); err != nil {
-		logger.Fatalf("FinalPledge pledgeWrapper err = %v", err)
+		logger.Fatalf("Pledge pledgeWrapper err = %v", err)
 	}
 
 }
