@@ -12,6 +12,7 @@ import (
 
 var logger = logging.GetLogger()
 
+// Ideas from https://github.com/openbsd/src/blob/master/usr.sbin/httpd/proc.c#L556-L574
 func DropPrivileges(
 	config *config.DropPrivileges,
 ) {
