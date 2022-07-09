@@ -7,11 +7,12 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 * Simple configuration file using JSON, examples in `configfiles` directory
 * Uses go's built-in `net/http` server, supporting HTTP/1.1 and HTTP/2.0
 * Optional request logging
-* Each HTTP server has a configured list of locations that are applied exactly in configured order for each request.
-  * Static file and directory serving
-  * Pre-compressed file and directory serving
-  * Blocked and redirect locations
+* Each HTTP server has a configured list of locations that are applied exactly in configured order for each request.  Location types:
+  * Static files and directories
+  * Pre-compressed files and directories
   * FastCGI
+  * Blocked locations
+  * Redirect locations
 * Configurable response header values at server and server-location levels.
 * Drops privileges at startup using `chroot`, `setuid`, `setgid`, and `pledge`.
 
