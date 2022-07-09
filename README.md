@@ -4,34 +4,16 @@ A simple webserver in go based on ideas from [OpenBSD httpd](https://man.openbsd
 
 ## Features
 
-* Simple configuration using JSON
-  * See `configfiles` directory for examples.
-* Uses go's built-in `net/http` server
-  * Supports HTTP/1.1 and HTTP/2.0
-  * Multiple servers can be configured with optional TLS.  
-  * Easy to use with acme-client, see `configfiles/gohttpd.json` example.
-  * Automatic thread creation by go, each request is run in its own goroutine.
+* Simple configuration file using JSON, examples in `configfiles` directory
+* Uses go's built-in `net/http` server, supporting HTTP/1.1 and HTTP/2.0
 * Optional request logging
-  * Uses `CombinedLoggingHandler` from `github.com/gorilla/handlers`
-  * Uses `gopkg.in/natefinch/lumberjack.v2` to rotate request log files when they reach a configured size.
-  * File I/O for request logging is asynchronous using a go channel.
 * Each HTTP server has a configured list of locations that are applied exactly in configured order for each request.
+  * Static file and directory serving
+  * Pre-compressed file and directory serving
+  * Blocked and redirect locations
+  * FastCGI
 * Configurable response header values at server and server-location levels.
-* Blocked and redirect locations.
-* Static file and directory serving using standard go `http.FileServer`.
-* Pre-compressed file serving using `github.com/lpar/gzipped/v2`
-  * Supports brotli and gzip files based on `Accept-Encoding` request header
-* FastCGI with unix sockets using `github.com/yookoala/gofast`
-* Drops privileges at startup and uses `pledge`.  Roughly the following happens at startup:
-  1. go-httpd daemon is started as root
-  2. Read configuration file and TLS certificates as root
-  3. Create and bind server sockets (`net.Listener`) as root, allowing use of privileged ports 80 and 443.
-  4. Call `chroot` to change root to `/var/www` or other configured directory
-  5. Call `setuid` and `setgid` to change to unpriviged `www` user/group or other configured user/group
-  6. Call `pledge` to limit system calls to `stdio rpath wpath cpath inet unix`.  
-  7. Create request logger if configured.
-  8. Create request handlers and start the HTTP servers.
-* A noop wrapper for pledge is used on non-OpenBSD OS.
+* Drops privileges at startup using `chroot`, `setuid`, `setgid`, and `pledge`.
 
 ## Usage on OpenBSD
 
